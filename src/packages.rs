@@ -3,14 +3,12 @@
 use crate::utils::log::{log, LogLevel};
 use bytes::Bytes;
 use colored::Colorize;
-use reqwest;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::{fmt, fs};
-use toml;
 
 static PACKAGES_URL: &str =
     "https://mirror.ghproxy.com/https://raw.githubusercontent.com/Ybeichen/ruxos-pkgs/master/";

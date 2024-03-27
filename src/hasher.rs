@@ -122,6 +122,7 @@ impl Hasher {
         let mut file = OpenOptions::new()
             .write(true)
             .create(true)
+            .truncate(true)
             .open(path)
             .unwrap_or_else(|_| {
                 log(LogLevel::Error, &format!("Failed to open file: {}", path));
@@ -141,6 +142,7 @@ impl Hasher {
         let mut file = OpenOptions::new()
             .write(true)
             .create(true)
+            .truncate(true)
             .open(path)
             .unwrap_or_else(|_| {
                 log(
@@ -182,10 +184,7 @@ impl Hasher {
             return true;
         }
         let hash = hash.unwrap();
-        let new_hash = match Hasher::hash_file(path) {
-            Some(h) => h,
-            None => String::new(),
-        };
+        let new_hash = Hasher::hash_file(path).unwrap_or_default();
         hash != new_hash
     }
 
@@ -194,10 +193,7 @@ impl Hasher {
     /// * `path` - The path of the file to save the hash of.
     /// * `path_hash` - The hashmap of paths and hashes.
     pub fn save_hash(path: &str, path_hash: &mut HashMap<String, String>) {
-        let new_hash = match Hasher::hash_file(path) {
-            Some(h) => h,
-            None => String::new(),
-        };
+        let new_hash = Hasher::hash_file(path).unwrap_or_default();
         let hash = Hasher::get_hash(path, path_hash);
         if hash.is_none() {
             path_hash.insert(path.to_string(), new_hash);

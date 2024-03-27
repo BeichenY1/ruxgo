@@ -251,7 +251,6 @@ impl<'a> Target<'a> {
 
         if gen_cc {
             let mut file = std::fs::OpenOptions::new()
-                .write(true)
                 .append(true)
                 .open("./compile_commands.json")
                 .unwrap();

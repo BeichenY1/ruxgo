@@ -175,7 +175,6 @@ pub fn build(
     }
     if gen_cc {
         let mut cc_file = fs::OpenOptions::new()
-            .write(true)
             .append(true)
             .open("compile_commands.json")
             .unwrap_or_else(|why| {
@@ -193,7 +192,6 @@ pub fn build(
 
     if gen_vsc {
         let mut vsc_file = fs::OpenOptions::new()
-            .write(true)
             .append(true)
             .open(".vscode/c_cpp_properties.json")
             .unwrap_or_else(|why| {
@@ -311,41 +309,45 @@ pub fn build(
             });
     }
 
-    log(
-        LogLevel::Log,
-        &format!(
-            "Compiling OS: {}, Ulib: {}",
-            os_config.name, os_config.ulib
-        ),
-    );
-    let (rux_feats_final, lib_feats_final) = features::cfg_feat_addprefix(os_config);
-    build_os(
-        os_config,
-        &os_config.ulib,
-        &rux_feats_final,
-        &lib_feats_final,
-    );
-    if os_config.ulib == "ruxlibc" {
-        build_ruxlibc(build_config, os_config, gen_cc);
-    } else if os_config.ulib == "ruxmusl" {
-        build_ruxmusl(build_config, os_config);
-    }
-
     let mut config_changed = false;
 
-    // Relinks if the os_config changes.
+    // Checks and constructs os and ulib based on the os_config changes.
     if os_config != &OSConfig::default() {
         let os_config_str = serde_json::to_string(os_config).unwrap_or_else(|_| "".to_string());
         let current_hash = Hasher::hash_string(&os_config_str);
         let old_hash = Hasher::read_hash_from_file(OSCONFIG_HASH_FILE);
         if old_hash != current_hash {
-            log(LogLevel::Log, "OS config changes, all need to be relinked");
+            log(
+                LogLevel::Log,
+                "OS config changed, all need to be relinked",
+            );
+            log(
+                LogLevel::Log,
+                &format!(
+                    "Compiling OS: {}, Ulib: {} ",
+                    os_config.name, os_config.ulib
+                ),
+            );
             config_changed = true;
+            let (rux_feats_final, lib_feats_final) = features::cfg_feat_addprefix(os_config);
+            build_os(
+                os_config,
+                &os_config.ulib,
+                &rux_feats_final,
+                &lib_feats_final,
+            );
+            if os_config.ulib == "ruxlibc" {
+                build_ruxlibc(build_config, os_config, gen_cc);
+            } else if os_config.ulib == "ruxmusl" {
+                build_ruxmusl(build_config, os_config);
+            }
             Hasher::save_hash_to_file(OSCONFIG_HASH_FILE, &current_hash);
+        } else {
+            log(LogLevel::Log, "OS config is up to date");
         }
     };
 
-    // Constructs each target separately
+    // Constructs each target separately based on the os_config changes.
     for target in targets {
         let mut tgt = Target::new(build_config, os_config, target, targets);
 
@@ -355,7 +357,6 @@ pub fn build(
 
     if gen_cc {
         let mut cc_file = fs::OpenOptions::new()
-            .write(true)
             .read(true)
             .append(true)
             .open("compile_commands.json")
@@ -786,6 +787,7 @@ pub fn init_project(project_name: &str, is_c: Option<bool>, config: &GlobalConfi
     let mut config_file = fs::OpenOptions::new()
         .write(true)
         .create(true)
+        .truncate(true)
         .open(config_file)
         .unwrap_or_else(|why| {
             log(
@@ -878,6 +880,7 @@ pub fn init_project(project_name: &str, is_c: Option<bool>, config: &GlobalConfi
         let mut main_file = fs::OpenOptions::new()
             .write(true)
             .create(true)
+            .truncate(true)
             .open(&main_path)
             .unwrap_or_else(|why| {
                 log(
@@ -939,6 +942,7 @@ pub fn init_project(project_name: &str, is_c: Option<bool>, config: &GlobalConfi
         let mut gitignore_file = fs::OpenOptions::new()
             .write(true)
             .create(true)
+            .truncate(true)
             .open(&gitignore_path)
             .unwrap_or_else(|why| {
                 log(
@@ -962,6 +966,7 @@ pub fn init_project(project_name: &str, is_c: Option<bool>, config: &GlobalConfi
     let mut readme_file = fs::OpenOptions::new()
         .write(true)
         .create(true)
+        .truncate(true)
         .open(project_name.to_owned() + "/README.md")
         .unwrap_or_else(|why| {
             log(
@@ -984,6 +989,7 @@ pub fn init_project(project_name: &str, is_c: Option<bool>, config: &GlobalConfi
     let mut license_file = fs::OpenOptions::new()
         .write(true)
         .create(true)
+        .truncate(true)
         .open(project_name.to_owned() + "/LICENSE")
         .unwrap_or_else(|why| {
             log(

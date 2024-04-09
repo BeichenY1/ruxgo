@@ -4,11 +4,11 @@ compiler = "gcc"
 [os]
 name = "ruxos"
 services = ["alloc","paging","irq","fp_simd","multitask","fs","blkfs","net","pipe","epoll","poll","rtc","virtio-9p"]
-ulib = "ruxlibc"
+ulib = "ruxmusl"
 
 [os.platform]
 name = "x86_64-qemu-q35"
-smp = "4"
+smp = "1"
 mode = "release"
 log = "error"
 
@@ -50,21 +50,12 @@ archive = "ar"
 ldflags = "rcs"
 
 [[targets]]
-name = "libredis_server"
+name = "ruxos_redis_server"
 src = "redis-7.0.12/src"
 src_exclude = ["/modules","/redis-benchmark.c","/ae_evport.c","/ae_epoll.c","/cli_common.c","/redis-cli.c","/ae_select.c","/ae_kqueue.c","/redisassert.c"]
 include_dir = "redis-7.0.12/src"
-type = "object"
-cflags = "-pedantic -DREDIS_STATIC='' -std=c99 -W -Wno-missing-field-initializers -O2 -g -ggdb -Wno-format -MMD"
-ldflags = "-g -ggdb -rdynamic -r"
-deps = ["libhiredis","liblua","libhdrhistogram"]
-
-[[targets]]
-name = "ruxos_redis_server"
-src = ""
-include_dir = ""
 type = "exe"
-cflags = ""
+cflags = "-pedantic -DREDIS_STATIC='' -std=c99 -W -Wno-missing-field-initializers -O2 -g -ggdb -Wno-format -MMD"
 linker = "rust-lld -flavor gnu"
 ldflags = ""
-deps = ["libredis_server"]
+deps = ["libhiredis","liblua","libhdrhistogram"]

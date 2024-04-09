@@ -8,12 +8,11 @@ ulib = "ruxlibc"
 
 [os.platform]
 name = "x86_64-qemu-q35"
-smp = "4"
+smp = "1"
 mode = "release"
 log = "warn"
 
 [os.platform.qemu]
-graphic = "n"
 blk = "y"
 
 [[targets]]

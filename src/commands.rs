@@ -310,6 +310,9 @@ pub fn build(
     }
 
     let mut config_changed = false;
+    if os_config.develop == "y" {
+        config_changed = true;
+    }
 
     // Checks and constructs os and ulib based on the os_config changes.
     if os_config != &OSConfig::default() {
@@ -318,7 +321,7 @@ pub fn build(
         let old_hash = Hasher::read_hash_from_file(OSCONFIG_HASH_FILE);
         if old_hash != current_hash {
             log(
-                LogLevel::Log,
+                LogLevel::Debug,
                 "OS config changed, all need to be relinked",
             );
             log(
@@ -1029,9 +1032,14 @@ pub fn init_project(project_name: &str, is_c: Option<bool>, config: &GlobalConfi
 /// Parses the config file of local project
 pub fn parse_config() -> (BuildConfig, OSConfig, Vec<TargetConfig>) {
     #[cfg(target_os = "linux")]
-    let (build_config, os_config, targets) = parser::parse_config("./config_linux.toml", false);
+    let (build_config, os_config, mut targets) = parser::parse_config("./config_linux.toml", false);
     #[cfg(target_os = "windows")]
     let (build_config, os_config, targets) = utils::parse_config("./config_win32.toml", true);
+
+    if build_config.loader_app[0] == "y" {
+        // Adds the loader's TargetConfig to targets
+        targets.push(build_loader(build_config.loader_app.clone()));
+    }
 
     let mut num_exe = 0;
     let mut exe_target: Option<&TargetConfig> = None;
@@ -1075,5 +1083,59 @@ pub fn pre_gen_vsc() {
     } else {
         fs::remove_file(Path::new("./.vscode/c_cpp_properties.json")).unwrap();
         fs::File::create(Path::new("./.vscode/c_cpp_properties.json")).unwrap();
+    }
+}
+
+pub fn build_loader(loader_program: Vec<String>) -> TargetConfig {
+    if loader_program.len() < 2 {
+        log(
+            LogLevel::Error,
+            "loader_app array must include at least two elements: a flag 'y' and a program path.",
+        );
+        std::process::exit(1);
+    }
+    let program_path = &loader_program[1];
+
+    // Defines the C source code for the loader
+    let loader_src = format!(
+        r#"
+#include <stdio.h>
+#include <unistd.h>
+int main(int argc, char **argv)
+{{
+    char *app_path = "{}";
+    execv(app_path, argv);
+    return 0;
+}}
+"#,
+        program_path
+    );
+
+    if !Path::new(BUILD_DIR).exists() {
+        fs::create_dir(BUILD_DIR).unwrap_or_else(|why| {
+            log(
+                LogLevel::Error,
+                &format!("Could not create ruxgo_bld directory: {}", why),
+            );
+            std::process::exit(1);
+        });
+    }
+    // Writes the loader to a temporary file
+    let loader_src_path = Path::new(BUILD_DIR).join("loader.c");
+    fs::write(loader_src_path, loader_src).expect("Failed to write to loader.c");
+
+    // Create an instance of TargetConfig to compile the loader
+    TargetConfig {
+        name: "loader".to_string(),
+        src: "ruxgo_bld/loader.c".to_string(),
+        src_only: Vec::new(),
+        src_exclude: Vec::new(),
+        include_dir: Vec::new(),
+        typ: "exe".to_string(),
+        cflags: "-g -Wall".to_string(),
+        archive: String::new(),
+        linker: "rust-lld -flavor gnu".to_string(),
+        ldflags: String::new(),
+        deps: Vec::new(),
     }
 }

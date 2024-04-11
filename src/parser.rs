@@ -16,6 +16,7 @@ use walkdir::WalkDir;
 #[derive(Debug, Clone)]
 pub struct BuildConfig {
     pub compiler: Arc<RwLock<String>>,
+    pub loader_app: Vec<String>,
 }
 
 /// Struct descibing the OS config of the local project
@@ -24,6 +25,7 @@ pub struct OSConfig {
     pub name: String,
     pub features: Vec<String>,
     pub ulib: String,
+    pub develop: String,
     pub platform: PlatformConfig,
 }
 
@@ -47,6 +49,7 @@ pub struct QemuConfig {
     pub debug: String,
     pub blk: String,
     pub net: String,
+    pub mem: String,
     pub graphic: String,
     pub bus: String,
     pub disk_img: String,
@@ -83,7 +86,7 @@ impl QemuConfig {
         qemu_args.push(format!("qemu-system-{}", platform_config.arch));
         // init
         qemu_args.push("-m".to_string());
-        qemu_args.push("128M".to_string());
+        qemu_args.push(self.mem.to_string());
         qemu_args.push("-smp".to_string());
         qemu_args.push(platform_config.smp.clone());
         // arch
@@ -406,7 +409,7 @@ pub fn parse_config(path: &str, check_dup_src: bool) -> (BuildConfig, OSConfig, 
 
     let build_config = parse_build_config(&config);
     let os_config = parse_os_config(&config, &build_config);
-    let targets = parse_targets(&config, check_dup_src);
+    let targets = parse_targets(&config, &build_config, check_dup_src);
 
     (build_config, os_config, targets)
 }
@@ -417,22 +420,15 @@ fn parse_build_config(config: &Table) -> BuildConfig {
         log(LogLevel::Error, "Could not find build in config file");
         std::process::exit(1);
     });
-    let compiler = Arc::new(RwLock::new(
-        build
-            .get("compiler")
-            .unwrap_or_else(|| {
-                log(LogLevel::Error, "Could not find compiler in config file");
-                std::process::exit(1);
-            })
-            .as_str()
-            .unwrap_or_else(|| {
-                log(LogLevel::Error, "Compiler is not a string");
-                std::process::exit(1);
-            })
-            .to_string(),
-    ));
-
-    BuildConfig { compiler }
+    let compiler = Arc::new(RwLock::new(parse_cfg_string(build, "compiler", "")));
+    let mut loader_app = parse_cfg_vector(build, "loader_app");
+    if loader_app.is_empty() {
+        loader_app.push("n".to_string());
+    }
+    BuildConfig {
+        compiler,
+        loader_app,
+    }
 }
 
 /// Parses the OS configuration
@@ -444,6 +440,7 @@ fn parse_os_config(config: &Table, build_config: &BuildConfig) -> OSConfig {
         if let Some(os_table) = os.as_table() {
             let name = parse_cfg_string(os_table, "name", "");
             let ulib = parse_cfg_string(os_table, "ulib", "");
+            let develop = parse_cfg_string(os_table, "develop", "n");
             let mut features = parse_cfg_vector(os_table, "services");
             if features.iter().any(|feat| {
                 feat == "fs"
@@ -471,6 +468,7 @@ fn parse_os_config(config: &Table, build_config: &BuildConfig) -> OSConfig {
                 name,
                 features,
                 ulib,
+                develop,
                 platform,
             };
         } else {
@@ -485,55 +483,63 @@ fn parse_os_config(config: &Table, build_config: &BuildConfig) -> OSConfig {
 }
 
 /// Parses the targets configuration
-fn parse_targets(config: &Table, check_dup_src: bool) -> Vec<TargetConfig> {
+fn parse_targets(
+    config: &Table,
+    build_config: &BuildConfig,
+    check_dup_src: bool,
+) -> Vec<TargetConfig> {
     let mut tgts = Vec::new();
-    let targets = config["targets"].as_array().unwrap_or_else(|| {
+    let targets = config.get("targets").and_then(|v| v.as_array());
+    if targets.is_none() && build_config.loader_app[0] == "n" {
         log(LogLevel::Error, "Could not find targets in config file");
         std::process::exit(1);
-    });
-    for target in targets {
-        let target_tb = target.as_table().unwrap_or_else(|| {
-            log(LogLevel::Error, "Target is not a table");
-            std::process::exit(1);
-        });
-        // include_dir is compatible with both string and vector types
-        let include_dir = if let Some(value) = target_tb.get("include_dir") {
-            match value {
-                Value::String(_s) => vec![parse_cfg_string(target_tb, "include_dir", "./")],
-                Value::Array(_arr) => parse_cfg_vector(target_tb, "include_dir"),
-                _ => {
-                    log(LogLevel::Error, "Invalid include_dir field");
-                    std::process::exit(1);
-                }
-            }
-        } else {
-            vec!["./".to_owned()]
-        };
-        let target_config = TargetConfig {
-            name: parse_cfg_string(target_tb, "name", ""),
-            src: parse_cfg_string(target_tb, "src", ""),
-            src_only: parse_cfg_vector(target_tb, "src_only"),
-            src_exclude: parse_cfg_vector(target_tb, "src_exclude"),
-            include_dir,
-            typ: parse_cfg_string(target_tb, "type", ""),
-            cflags: parse_cfg_string(target_tb, "cflags", ""),
-            archive: parse_cfg_string(target_tb, "archive", ""),
-            linker: parse_cfg_string(target_tb, "linker", ""),
-            ldflags: parse_cfg_string(target_tb, "ldflags", ""),
-            deps: parse_cfg_vector(target_tb, "deps"),
-        };
-        if target_config.typ != "exe"
-            && target_config.typ != "dll"
-            && target_config.typ != "static"
-            && target_config.typ != "object"
-        {
-            log(LogLevel::Error, "Type must be exe, dll, object or static");
-            std::process::exit(1);
-        }
-        tgts.push(target_config);
     }
-    if tgts.is_empty() {
-        log(LogLevel::Error, "No targets found");
+    if let Some(targets) = targets {
+        for target in targets {
+            let target_tb = target.as_table().unwrap_or_else(|| {
+                log(LogLevel::Error, "Target is not a table");
+                std::process::exit(1);
+            });
+            // include_dir is compatible with both string and vector types
+            let include_dir = if let Some(value) = target_tb.get("include_dir") {
+                match value {
+                    Value::String(_s) => vec![parse_cfg_string(target_tb, "include_dir", "./")],
+                    Value::Array(_arr) => parse_cfg_vector(target_tb, "include_dir"),
+                    _ => {
+                        log(LogLevel::Error, "Invalid include_dir field");
+                        std::process::exit(1);
+                    }
+                }
+            } else {
+                vec!["./".to_owned()]
+            };
+            let target_config = TargetConfig {
+                name: parse_cfg_string(target_tb, "name", ""),
+                src: parse_cfg_string(target_tb, "src", ""),
+                src_only: parse_cfg_vector(target_tb, "src_only"),
+                src_exclude: parse_cfg_vector(target_tb, "src_exclude"),
+                include_dir,
+                typ: parse_cfg_string(target_tb, "type", ""),
+                cflags: parse_cfg_string(target_tb, "cflags", ""),
+                archive: parse_cfg_string(target_tb, "archive", ""),
+                linker: parse_cfg_string(target_tb, "linker", ""),
+                ldflags: parse_cfg_string(target_tb, "ldflags", ""),
+                deps: parse_cfg_vector(target_tb, "deps"),
+            };
+            if target_config.typ != "exe"
+                && target_config.typ != "dll"
+                && target_config.typ != "static"
+                && target_config.typ != "object"
+            {
+                log(LogLevel::Error, "Type must be exe, dll, object or static");
+                std::process::exit(1);
+            }
+            tgts.push(target_config);
+        }
+    }
+
+    if build_config.loader_app[0] == "n" && tgts.is_empty() {
+        log(LogLevel::Error, "No targets found!");
         std::process::exit(1);
     }
 
@@ -618,6 +624,7 @@ fn parse_qemu(arch: &str, config: &Table) -> QemuConfig {
         let debug = parse_cfg_string(qemu_table, "debug", "n");
         let blk = parse_cfg_string(qemu_table, "blk", "n");
         let net = parse_cfg_string(qemu_table, "net", "n");
+        let mem = parse_cfg_string(qemu_table, "memory", "128M");
         let graphic = parse_cfg_string(qemu_table, "graphic", "n");
         let bus = match arch {
             "x86_64" => "pci".to_string(),
@@ -655,6 +662,7 @@ fn parse_qemu(arch: &str, config: &Table) -> QemuConfig {
             debug,
             blk,
             net,
+            mem,
             graphic,
             bus,
             disk_img,

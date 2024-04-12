@@ -16,7 +16,7 @@ use walkdir::WalkDir;
 #[derive(Debug, Clone)]
 pub struct BuildConfig {
     pub compiler: Arc<RwLock<String>>,
-    pub loader_app: Vec<String>,
+    pub app: String,
 }
 
 /// Struct descibing the OS config of the local project
@@ -421,14 +421,9 @@ fn parse_build_config(config: &Table) -> BuildConfig {
         std::process::exit(1);
     });
     let compiler = Arc::new(RwLock::new(parse_cfg_string(build, "compiler", "")));
-    let mut loader_app = parse_cfg_vector(build, "loader_app");
-    if loader_app.is_empty() {
-        loader_app.push("n".to_string());
-    }
-    BuildConfig {
-        compiler,
-        loader_app,
-    }
+    let app = parse_cfg_string(build, "app", "");
+
+    BuildConfig { compiler, app }
 }
 
 /// Parses the OS configuration
@@ -490,7 +485,7 @@ fn parse_targets(
 ) -> Vec<TargetConfig> {
     let mut tgts = Vec::new();
     let targets = config.get("targets").and_then(|v| v.as_array());
-    if targets.is_none() && build_config.loader_app[0] == "n" {
+    if targets.is_none() && build_config.app.is_empty() {
         log(LogLevel::Error, "Could not find targets in config file");
         std::process::exit(1);
     }
@@ -538,7 +533,7 @@ fn parse_targets(
         }
     }
 
-    if build_config.loader_app[0] == "n" && tgts.is_empty() {
+    if tgts.is_empty() && build_config.app.is_empty() {
         log(LogLevel::Error, "No targets found!");
         std::process::exit(1);
     }

@@ -1036,9 +1036,9 @@ pub fn parse_config() -> (BuildConfig, OSConfig, Vec<TargetConfig>) {
     #[cfg(target_os = "windows")]
     let (build_config, os_config, targets) = utils::parse_config("./config_win32.toml", true);
 
-    if build_config.loader_app[0] == "y" {
+    if !build_config.app.is_empty() {
         // Adds the loader's TargetConfig to targets
-        targets.push(build_loader(build_config.loader_app.clone()));
+        targets.push(build_loader(build_config.app.clone()));
     }
 
     let mut num_exe = 0;
@@ -1086,16 +1086,7 @@ pub fn pre_gen_vsc() {
     }
 }
 
-pub fn build_loader(loader_program: Vec<String>) -> TargetConfig {
-    if loader_program.len() < 2 {
-        log(
-            LogLevel::Error,
-            "loader_app array must include at least two elements: a flag 'y' and a program path.",
-        );
-        std::process::exit(1);
-    }
-    let program_path = &loader_program[1];
-
+pub fn build_loader(loader_program: String) -> TargetConfig {
     // Defines the C source code for the loader
     let loader_src = format!(
         r#"
@@ -1108,7 +1099,7 @@ int main(int argc, char **argv)
     return 0;
 }}
 "#,
-        program_path
+        loader_program
     );
 
     if !Path::new(BUILD_DIR).exists() {

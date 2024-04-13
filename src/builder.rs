@@ -1066,7 +1066,6 @@ impl Src {
             }
             None
         } else {
-            log(LogLevel::Error, &format!("  Error: {}", &self.name));
             log(LogLevel::Error, &format!("  Command: {}", &cmd));
             log(
                 LogLevel::Error,

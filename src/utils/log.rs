@@ -57,11 +57,11 @@ pub fn log(level: LogLevel, message: &str) {
         init_log_level();
     });
     let level_str = match level {
-        LogLevel::Debug => "[DEBUG]".purple(),
-        LogLevel::Info => "[INFO]".blue(),
-        LogLevel::Log => "[LOG]".green(),
-        LogLevel::Warn => "[WARN]".yellow(),
-        LogLevel::Error => "[ERROR]".red(),
+        LogLevel::Debug => "[DEBUG]".purple().bold(),
+        LogLevel::Info => "[INFO]".blue().bold(),
+        LogLevel::Log => "[LOG]".green().bold(),
+        LogLevel::Warn => "[WARN]".yellow().bold(),
+        LogLevel::Error => "[ERROR]".red().bold(),
     };
     // Use read lock to check log level
     if level >= *LOG_LEVEL.read().unwrap() {

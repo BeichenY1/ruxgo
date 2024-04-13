@@ -520,7 +520,7 @@ fn build_ruxmusl(build_config: &BuildConfig, os_config: &OSConfig) {
 
         let compiler = build_config.compiler.read().unwrap();
         let mut cmd = format!(
-            "{}/configure --prefix=./install --exec-prefix=./ --syslibdir=./install/lib",
+            "{}/configure --prefix=./install --exec-prefix=./ --syslibdir=./install/lib --disable-warnings",
             ruxmusl_abs_path_str
         );
         if build_config.app.is_empty() {

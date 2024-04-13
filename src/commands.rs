@@ -310,16 +310,13 @@ pub fn build(
     }
 
     let mut config_changed = false;
-    if os_config.develop == "y" {
-        config_changed = true;
-    }
 
     // Checks and constructs os and ulib based on the os_config changes.
     if os_config != &OSConfig::default() {
         let os_config_str = serde_json::to_string(os_config).unwrap_or_else(|_| "".to_string());
         let current_hash = Hasher::hash_string(&os_config_str);
         let old_hash = Hasher::read_hash_from_file(OSCONFIG_HASH_FILE);
-        if old_hash != current_hash {
+        if old_hash != current_hash || os_config.develop == "y" {
             log(
                 LogLevel::Debug,
                 "OS config changed, all need to be relinked",
@@ -520,9 +517,17 @@ fn build_ruxmusl(build_config: &BuildConfig, os_config: &OSConfig) {
         let ruxmusl_abs_path_str = ruxmusl_abs_path
             .to_str()
             .expect("Failed to convert path to string");
-        let cmd = format!(
-            "{}/configure --prefix=./install --exec-prefix=./ --syslibdir=./install/lib --disable-shared ARCH={} CC={}",
-            ruxmusl_abs_path_str, os_config.platform.arch, build_config.compiler.read().unwrap());
+
+        let compiler = build_config.compiler.read().unwrap();
+        let mut cmd = format!(
+            "{}/configure --prefix=./install --exec-prefix=./ --syslibdir=./install/lib",
+            ruxmusl_abs_path_str
+        );
+        if build_config.app.is_empty() {
+            cmd += " --disable-shared";
+        }
+        cmd += &format!(" ARCH={} CC={}", os_config.platform.arch, compiler);
+
         log(LogLevel::Info, &format!("Command: {}", cmd));
         let configure_output = Command::new("sh")
             .arg("-c")
@@ -617,6 +622,10 @@ pub fn run(
                 make_disk_image_fat32(&os_config.platform.qemu.disk_img);
             }
         }
+        // create loaded app file systems if needed
+        if !build_config.app.is_empty() && &os_config.platform.qemu.v9p == "y" {
+            crate_app_fs(build_config, os_config);
+        }
         // enable qemu gdb guest if needed
         if &os_config.platform.qemu.debug == "y" {
             run_qemu_debug(qemu_args_debug, bin_args);
@@ -642,7 +651,10 @@ pub fn run(
         if output.is_ok() {
             log(LogLevel::Info, &format!("  Success: {}", &trgt.bin_path));
         } else {
-            log(LogLevel::Error, &format!("  Error: {}", &trgt.bin_path));
+            log(
+                LogLevel::Error,
+                &format!("  Error: {}", output.err().unwrap()),
+            );
             std::process::exit(1);
         }
     }
@@ -1037,8 +1049,11 @@ pub fn parse_config() -> (BuildConfig, OSConfig, Vec<TargetConfig>) {
     let (build_config, os_config, targets) = utils::parse_config("./config_win32.toml", true);
 
     if !build_config.app.is_empty() {
-        // Adds the loader's TargetConfig to targets
-        targets.push(build_loader(build_config.app.clone()));
+        if let Some(app_filename) = Path::new(&build_config.app).file_name() {
+            let loader_program = Path::new("/bin").join(app_filename);
+            // Adds the loader's TargetConfig to targets
+            targets.push(build_loader(loader_program.to_str().unwrap()));
+        }
     }
 
     let mut num_exe = 0;
@@ -1086,7 +1101,8 @@ pub fn pre_gen_vsc() {
     }
 }
 
-pub fn build_loader(loader_program: String) -> TargetConfig {
+// Creates the loader function
+pub fn build_loader(loader_program: &str) -> TargetConfig {
     // Defines the C source code for the loader
     let loader_src = format!(
         r#"
@@ -1115,7 +1131,7 @@ int main(int argc, char **argv)
     let loader_src_path = Path::new(BUILD_DIR).join("loader.c");
     fs::write(loader_src_path, loader_src).expect("Failed to write to loader.c");
 
-    // Create an instance of TargetConfig to compile the loader
+    // Creates an instance of TargetConfig to compile the loader
     TargetConfig {
         name: "loader".to_string(),
         src: "ruxgo_bld/loader.c".to_string(),
@@ -1128,5 +1144,50 @@ int main(int argc, char **argv)
         linker: "rust-lld -flavor gnu".to_string(),
         ldflags: String::new(),
         deps: Vec::new(),
+    }
+}
+
+// Creates the app file system and related content
+pub fn crate_app_fs(build_config: &BuildConfig, os_config: &OSConfig) {
+    // Copys the dynamic_lib if needed
+    let actual_lib_name = "libc.so";
+    let lib_name = format!("ld-musl-{}.so.1", os_config.platform.arch.as_str());
+    let src_path = Path::new(RUXMUSL_DIR).join(format!("install/lib/{}", actual_lib_name));
+    let dest_path = Path::new(&os_config.platform.qemu.v9p_path).join("lib");
+    if let Err(e) = fs::create_dir_all(&dest_path) {
+        log(
+            LogLevel::Error,
+            &format!("Failed to create directories: {}", e),
+        );
+        std::process::exit(1);
+    }
+    if src_path.exists() {
+        if let Err(err) = fs::copy(&src_path, dest_path.join(lib_name)) {
+            log(LogLevel::Error, &format!("Failed to copy file: {}", err));
+            std::process::exit(1);
+        }
+    } else {
+        log(LogLevel::Error, "The ruxmusl dynamic library does not exist");
+        std::process::exit(1);
+    }
+    // Copys the bin file
+    let app_dest_bin = Path::new(&os_config.platform.qemu.v9p_path).join("bin");
+    if let Err(e) = fs::create_dir_all(&app_dest_bin) {
+        log(
+            LogLevel::Error,
+            &format!("Failed to create bin directory: {}", e),
+        );
+        std::process::exit(1);
+    }
+    let app_src = Path::new(&build_config.app);
+    if let Some(app_filename) = app_src.file_name() {
+        let app_dest = app_dest_bin.join(app_filename);
+        if let Err(err) = fs::copy(app_src, app_dest) {
+            log(
+                LogLevel::Error,
+                &format!("Binary file does not exist or path is incorrect: {}", err),
+            );
+            std::process::exit(1);
+        }
     }
 }

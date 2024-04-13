@@ -981,7 +981,7 @@ impl Src {
         if !os_config.name.is_empty() {
             os_cflags.push_str("-nostdinc -fno-builtin -ffreestanding -Wall");
             if os_config.ulib == "ruxlibc" {
-                os_cflags.push_str(" -I");
+                os_cflags.push_str(" -isystem");
                 os_cflags.push_str(RUXLIBC_INC.as_str());
                 let (_, lib_feats) = cfg_feat(os_config);
                 // generate the preprocessing macro definition
@@ -994,7 +994,7 @@ impl Src {
                     os_config.platform.log.to_uppercase()
                 ));
             } else if os_config.ulib == "ruxmusl" {
-                os_cflags.push_str(" -I");
+                os_cflags.push_str(" -isystem");
                 os_cflags.push_str(RUXMUSL_INC);
             }
             if os_config.platform.mode == "release" {

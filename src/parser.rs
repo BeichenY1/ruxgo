@@ -486,7 +486,10 @@ fn parse_targets(
     let mut tgts = Vec::new();
     let targets = config.get("targets").and_then(|v| v.as_array());
     if targets.is_none() && build_config.app.is_empty() {
-        log(LogLevel::Error, "Could not find targets in config file");
+        log(
+            LogLevel::Error,
+            "Could not find targets or app in config file",
+        );
         std::process::exit(1);
     }
     if let Some(targets) = targets {

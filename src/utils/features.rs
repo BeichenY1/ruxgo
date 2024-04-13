@@ -7,6 +7,7 @@ pub fn cfg_feat(os_config: &OSConfig) -> (Vec<String>, Vec<String>) {
     let mut lib_features = vec![
         "fp_simd",
         "alloc",
+        "paging",
         "multitask",
         "fs",
         "net",

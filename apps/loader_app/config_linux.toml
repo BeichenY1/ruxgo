@@ -1,0 +1,22 @@
+[build]
+compiler = "gcc"
+# fill in your app path
+app = "/your_app_path"
+
+[os]
+name = "ruxos"
+services = ["alloc","fp_simd","irq","multitask","fs","net","pipe","epoll","poll","rtc","virtio-9p"]
+ulib = "ruxmusl"
+
+[os.platform]
+name = "aarch64-qemu-virt"
+smp = "1"
+log = "info"
+
+[os.platform.qemu]
+memory = "256M"
+net = "y"
+v9p = "y"
+v9p_path = "./rootfs"
+# your app parameter config
+args = ""

@@ -1,61 +1,37 @@
 # Ruxgo
 
-Ruxgo is a Cargo-like build tool for building C and C++ applications that relies solely on a Toml file. 
+Ruxgo is a Cargo-like build tool for building C/C++ applications that relies solely on a Toml file. 
+
+It is also a companion command-line tool for RuxOS and has the explicit aim of making it easy to build and manage your C/C++ applications.
 
 **To start using Ruxgo**, learn more at [The Ruxgo Book](https://ruxgo.syswonder.org/).
 
-🚧 Working In Progress. 
-
 ## Installation
 
-To build the `ruxgo` executable from source, you will first need to install Rust and Cargo. Follow the instructions on the [Rust installation page](https://www.rust-lang.org/tools/install). Ruxgo currently requires at least Rust version 1.74.
-
-Once you have installed Rust, the following command can be used to build and install Ruxgo:
+Ruxgo currently requires at least Rust version 1.75. You can install it with Cargo:
 
 ```sh
 cargo install ruxgo
 ```
 
-The version published to [crates.io](https://crates.io/) will ever so slightly be behind the version hosted on GitHub. If you need the latest version you can build the git version of ruxgo yourself.
-
-```sh
-cargo install --git https://github.com/syswonder/ruxgo.git ruxgo
-```
-
 ## Usage
 
-Write a `config_linux.toml` for linux and `config_win32.toml` for windows in the project directory.
+Ruxgo supports building self-developed applications to run on linux or windows platforms, and also supports assembling and building Unikernel-based RuxOS and running applications on it. You just need to Write a `config_linux.toml` for linux or `config_win32.toml` for windows in the project directory.
 
-You can then build the project with:
-```console
-ruxgo -b
-```
+The `ruxgo/apps/` directory places all the Toml files that have been tested, you can switch to either directory and follow the instructions to build the application.
 
-Once built, you can execute the project via:
-```console
-ruxgo -r
-```
+- If you are developing your own application and want to build and run it, you can refer to the template to write a Toml file, then put it in your project directory, and use ruxgo to build and run it.
 
-For help:
-```console
-ruxgo --help
-```
+- If you want to build an already supported app on ruxos, you need to copy `config_<platform>.toml` from `ruxgo/apps/<name>/ruxos` into `ruxos/apps/c/<name>`, then refer to the instructions and use ruxgo to build and run it.
 
-You can also configure the log level with the environment variable `"RUXGO_LOG_LEVEL"`, the default log level is "Info".
-
-## Ruxgo-apps
-
-The `ruxgo/apps/` directory places all the Toml files that have been tested, you can switch to either directory and follow the instructions to build the application. Currently, there are two ways to build an app:
-
-- If building locally, you'll need to download the apps source code and then use ruxgo to build and run it.
-
-- If you want to build on ruxos, you need to copy `config_<platform>.toml` from `ruxgo/apps/<name>/ruxos` into `ruxos/apps/c/<name>`, then download the apps source code and use ruxgo to build and run it.
+- If you have your own app executable and want to run it on RuxOS, you can refer to the template under `ruxgo/apps/loader_app` and configure your own, then use ruxgo to build and run it.
 
 **Note:** Refer to the README.md in each app directory for details. The following applications are already supported:
 
 * [x] [redis](apps/redis)
 * [x] [sqlite3](apps/sqlite3)
 * [x] [iperf](apps/iperf)
+* [x] [loader_app](apps/loader_app)
 * [x] helloworld
 * [x] memtest
 * [x] httpclient

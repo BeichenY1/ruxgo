@@ -612,7 +612,7 @@ pub fn run(
             let path = Path::new(&os_config.platform.qemu.disk_img);
             if path.exists() {
                 log(
-                    LogLevel::Log,
+                    LogLevel::Info,
                     &format!(
                         "disk image \"{}\" already exists!",
                         os_config.platform.qemu.disk_img
@@ -624,7 +624,7 @@ pub fn run(
         }
         // create loaded app file systems if needed
         if !build_config.app.is_empty() && &os_config.platform.qemu.v9p == "y" {
-            crate_app_fs(build_config, os_config);
+            create_app_fs(build_config, os_config);
         }
         // enable qemu gdb guest if needed
         if &os_config.platform.qemu.debug == "y" {
@@ -1148,41 +1148,43 @@ int main(int argc, char **argv)
 }
 
 // Creates the app file system and related content
-pub fn crate_app_fs(build_config: &BuildConfig, os_config: &OSConfig) {
+pub fn create_app_fs(build_config: &BuildConfig, os_config: &OSConfig) {
     // Copys the dynamic_lib if needed
-    let actual_lib_name = "libc.so";
     let lib_name = format!("ld-musl-{}.so.1", os_config.platform.arch.as_str());
-    let src_path = Path::new(RUXMUSL_DIR).join(format!("install/lib/{}", actual_lib_name));
-    let dest_path = Path::new(&os_config.platform.qemu.v9p_path).join("lib");
-    if let Err(e) = fs::create_dir_all(&dest_path) {
+    let lib_src = Path::new(RUXMUSL_DIR).join("install/lib/libc.so");
+    let lib_dest = Path::new(&os_config.platform.qemu.v9p_path).join("lib");
+    if let Err(e) = fs::create_dir_all(&lib_dest) {
         log(
             LogLevel::Error,
             &format!("Failed to create directories: {}", e),
         );
         std::process::exit(1);
     }
-    if src_path.exists() {
-        if let Err(err) = fs::copy(&src_path, dest_path.join(lib_name)) {
+    if lib_src.exists() {
+        if let Err(err) = fs::copy(&lib_src, lib_dest.join(lib_name)) {
             log(LogLevel::Error, &format!("Failed to copy file: {}", err));
             std::process::exit(1);
         }
     } else {
-        log(LogLevel::Error, "The ruxmusl dynamic library does not exist");
+        log(
+            LogLevel::Error,
+            "The ruxmusl dynamic library does not exist",
+        );
         std::process::exit(1);
     }
+
     // Copys the bin file
-    let app_dest_bin = Path::new(&os_config.platform.qemu.v9p_path).join("bin");
-    if let Err(e) = fs::create_dir_all(&app_dest_bin) {
+    let app_src = Path::new(&build_config.app);
+    let app_dest = Path::new(&os_config.platform.qemu.v9p_path).join("bin");
+    if let Err(e) = fs::create_dir_all(&app_dest) {
         log(
             LogLevel::Error,
             &format!("Failed to create bin directory: {}", e),
         );
         std::process::exit(1);
     }
-    let app_src = Path::new(&build_config.app);
     if let Some(app_filename) = app_src.file_name() {
-        let app_dest = app_dest_bin.join(app_filename);
-        if let Err(err) = fs::copy(app_src, app_dest) {
+        if let Err(err) = fs::copy(app_src, app_dest.join(app_filename)) {
             log(
                 LogLevel::Error,
                 &format!("Binary file does not exist or path is incorrect: {}", err),

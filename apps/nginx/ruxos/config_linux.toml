@@ -5,12 +5,12 @@ compiler = "gcc"
 [os]
 name = "ruxos"
 services = ["alloc","paging","irq","fp_simd","multitask","fs","blkfs",
-            "net","pipe","epoll","poll","rtc","select","virtio-9p"]
-ulib = "ruxlibc"
+            "net","pipe","epoll","poll","rtc","select","virtio-9p","signal"]
+ulib = "ruxmusl"
 
 [os.platform]
 name = "aarch64-qemu-virt"
-smp = "4"
+smp = "1"
 mode = "release"
 log = "info"
 
@@ -19,51 +19,51 @@ blk = "y"
 net = "y"
 v9p = "y"
 v9p_path = "./html"
-graphic = "n"
 disk_img = "fat32.img"
-args = "./nginx_app"
-net_dev = "user"
 
 ### src to compile
 [[targets]]
 name = "libcore"
-src = "nginx-1.24.0/src/core"
+src = "./nginx-1.24.0/src/core"
 src_exclude = ["ngx_regex.c","ngx_thread_pool.c"]
-include_dir = ["./objs","nginx-1.24.0/src/core","nginx-1.24.0/src/event",
-                "nginx-1.24.0/src/event/modules","nginx-1.24.0/src/os/unix"]
-type = "object"
-cflags = "-Wno-format"
-ldflags = "-r"
+include_dir = ["./objs","./nginx-1.24.0/src/core","./nginx-1.24.0/src/event",
+                "./nginx-1.24.0/src/event/modules","./nginx-1.24.0/src/os/unix"]
+type = "static"
+cflags = ""
+archive = "ar"
+ldflags = "rcs"
 
 [[targets]]
 name = "libevent"
-src = "nginx-1.24.0/src/event"
+src = "./nginx-1.24.0/src/event"
 src_exclude = ["/modules","ngx_event_acceptex.c","ngx_event_connectex.c",
             "ngx_event_openssl_stapling.c","ngx_event_openssl.c"]
-include_dir = ["./objs","nginx-1.24.0/src/core","nginx-1.24.0/src/event",
-                "nginx-1.24.0/src/event/modules","nginx-1.24.0/src/os/unix"]
-type = "object"
-cflags = "-Wno-format"
-ldflags = "-r"
+include_dir = ["./objs","./nginx-1.24.0/src/core","./nginx-1.24.0/src/event",
+                "./nginx-1.24.0/src/event/modules","./nginx-1.24.0/src/os/unix"]
+type = "static"
+cflags = ""
+archive = "ar"
+ldflags = "rcs"
 
 [[targets]]
 name = "libevent_modules"
-src = "nginx-1.24.0/src/event/modules"
+src = "./nginx-1.24.0/src/event/modules"
 src_exclude = [
             "ngx_devpoll_module.c","ngx_eventport_module.c",
             "ngx_iocp_module.c","ngx_kqueue_module.c",
             "ngx_poll_module.c","ngx_win32_poll_module.c",
             "ngx_win32_select_module.c"
             ]
-include_dir = ["./objs","nginx-1.24.0/src/core","nginx-1.24.0/src/event",
-                "nginx-1.24.0/src/event/modules","nginx-1.24.0/src/os/unix"]
-type = "object"
-cflags = "-Wno-format"
-ldflags = "-r"
+include_dir = ["./objs","./nginx-1.24.0/src/core","./nginx-1.24.0/src/event",
+                "./nginx-1.24.0/src/event/modules","./nginx-1.24.0/src/os/unix"]
+type = "static"
+cflags = ""
+archive = "ar"
+ldflags = "rcs"
 
 [[targets]]
 name = "libos_unix"
-src = "nginx-1.24.0/src/os/unix"
+src = "./nginx-1.24.0/src/os/unix"
 src_exclude = [
             "ngx_darwin_init.c","ngx_darwin_sendfile_chain.c",
             "ngx_file_aio_read.c","ngx_freebsd_init.c",
@@ -71,26 +71,28 @@ src_exclude = [
             "ngx_solaris_init.c","ngx_solaris_sendfilev_chain.c",
             "ngx_thread_cond.c","ngx_thread_id.c","ngx_thread_mutex.c"
             ]
-include_dir = ["./objs","nginx-1.24.0/src/core","nginx-1.24.0/src/event",
-                "nginx-1.24.0/src/event/modules","nginx-1.24.0/src/os/unix"]
-type = "object"
-cflags = "-Wno-format"
-ldflags = "-r"
+include_dir = ["./objs","./nginx-1.24.0/src/core","./nginx-1.24.0/src/event",
+                "./nginx-1.24.0/src/event/modules","./nginx-1.24.0/src/os/unix"]
+type = "static"
+cflags = ""
+archive = "ar"
+ldflags = "rcs"
 
 [[targets]]
 name = "libhttp"
-src = "nginx-1.24.0/src/http"
+src = "./nginx-1.24.0/src/http"
 src_exclude = ["/modules","/v2","ngx_http_file_cache.c",
             "ngx_http_huff_decode.c","ngx_http_huff_encode.c"]
-include_dir = ["nginx-1.24.0/src/http","nginx-1.24.0/src/http/modules","nginx-1.24.0/src/core",
-                "nginx-1.24.0/src/event","nginx-1.24.0/src/event/modules","nginx-1.24.0/src/os/unix","./objs"]
-type = "object"
-cflags = "-Wno-format"
-ldflags = "-r"
+include_dir = ["./nginx-1.24.0/src/http","./nginx-1.24.0/src/http/modules","./nginx-1.24.0/src/core",
+                "./nginx-1.24.0/src/event","./nginx-1.24.0/src/event/modules","./nginx-1.24.0/src/os/unix","./objs"]
+type = "static"
+cflags = ""
+archive = "ar"
+ldflags = "rcs"
 
 [[targets]]
 name = "libhttp_modules"
-src = "nginx-1.24.0/src/http/modules"
+src = "./nginx-1.24.0/src/http/modules"
 src_exclude = [
             "/perl","ngx_http_addition_filter_module.c",
             "ngx_http_auth_basic_module.c","ngx_http_auth_request_module.c",
@@ -104,30 +106,24 @@ src_exclude = [
             "ngx_http_slice_filter_module.c","ngx_http_ssl_module.c",
             "ngx_http_stub_status_module.c","ngx_http_xslt_filter_module.c"
             ]
-include_dir = ["nginx-1.24.0/src/http","nginx-1.24.0/src/http/modules",
-                "nginx-1.24.0/src/core","nginx-1.24.0/src/event",
-                "nginx-1.24.0/src/event/modules","nginx-1.24.0/src/os/unix","./objs"]
-type = "object"
-cflags = "-Wno-format"
-ldflags = "-r"
-
-[[targets]]
-name = "libobjs"
-src = "./objs"
-include_dir = ["./objs","nginx-1.24.0/src/core","nginx-1.24.0/src/event",
-                "nginx-1.24.0/src/event/modules","nginx-1.24.0/src/os/unix"]
-type = "object"
-cflags = "-Wno-format"
-ldflags = "-r"
+include_dir = ["./nginx-1.24.0/src/http","./nginx-1.24.0/src/http/modules",
+                "./nginx-1.24.0/src/core","./nginx-1.24.0/src/event",
+                "./nginx-1.24.0/src/event/modules","./nginx-1.24.0/src/os/unix","./objs"]
+type = "static"
+cflags = ""
+archive = "ar"
+ldflags = "rcs"
 
 ### linker
 [[targets]]
 name = "ruxos_nginx"
-src = ""
-include_dir = ""
+src = "./objs"
+src_exclude = ["./objs/nginx-1.24.0"]
+include_dir = ["./objs","./nginx-1.24.0/src/core","./nginx-1.24.0/src/event",
+                "./nginx-1.24.0/src/event/modules","./nginx-1.24.0/src/os/unix"]
 type = "exe"
-cflags = "-Wno-format"
+cflags = ""
 linker = "rust-lld -flavor gnu"
 ldflags = ""
-deps = ["libobjs","libcore","libevent","libevent_modules",
+deps = ["libcore","libevent","libevent_modules",
         "libos_unix","libhttp","libhttp_modules"]

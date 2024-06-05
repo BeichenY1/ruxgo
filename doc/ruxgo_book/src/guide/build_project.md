@@ -1,6 +1,6 @@
 # 构建一个项目
 
-首先，确保您的系统上已安装 ruxgo。如果尚未安装，请参考 [Ruxgo 安装](../installation.md) 。
+可以使用 Ruxgo 快速开始一个项目。首先，确保您的系统上已安装 ruxgo。如果尚未安装，请参考 [Ruxgo 安装](../installation.md) 。
 
 之后使用如下命令初始化一个 C 项目：
 

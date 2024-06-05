@@ -6,13 +6,11 @@
 
 * [Ruxgo 指南](guide/index.md)
     * [​为什么 Ruxgo](guide/why_ruxgo.md)
-    * [Ruxgo 设计特性](guide/ruxgo_features.md)
+    * [Ruxgo 设计目标](guide/ruxgo_goals.md)
+    * [构建描述说明](guide/build_description.md)
+        * [TOML 文件设计](guide/toml_design.md)
+        * [TOML 文件示例](guide/toml_example.md)
     * [构建一个项目](guide/build_project.md)
-    * [配置 TOML](guide/toml_file.md)
-        * [builder 模块](guide/builder_module.md)
-        * [target 模块](guide/target_module.md)
-        * [os 模块](guide/os_module.md)
-    * [TOML 文件示例](guide/toml_example.md)
 
 * [Ruxgo 命令](commands/index.md)
     * [通用命令](commands/general-commands.md)

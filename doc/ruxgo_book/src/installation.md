@@ -18,4 +18,4 @@ cargo install --git https://github.com/syswonder/ruxgo.git ruxgo
 
 **注意:**
 
-如果您在安装时遇到问题，可能需要安装一些构建依赖项，请参考 RuxOS 下的[README.md](https://github.com/syswonder/ruxos?tab=readme-ov-file#install-build-dependencies).
+如果您在安装时遇到问题，可能需要安装一些构建依赖项，请参考 RuxOS 下的 [README.md](https://github.com/syswonder/ruxos?tab=readme-ov-file#install-build-dependencies).

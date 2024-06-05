@@ -1,7 +1,7 @@
 # Ruxgo
 
 <p align="center">
-    <img src="./guide/images/ruxgo-logo.svg" alt="ruxgo-logo" width="55%">
+    <img src="doc/ruxgo_book/src/guide/images/ruxgo-logo1.svg" alt="ruxgo-logo" width="55%">
 </p>
 
 Ruxgo is a companion command-line tool for RuxOS.

@@ -1,0 +1,250 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>​为什么 Ruxgo - Ruxgo 手册</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../introduction.html">简介</a></li><li class="chapter-item expanded "><a href="../installation.html"><strong aria-hidden="true">1.</strong> Ruxgo 安装</a></li><li class="chapter-item expanded "><a href="../guide/index.html"><strong aria-hidden="true">2.</strong> Ruxgo 指南</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../guide/why_ruxgo.html" class="active"><strong aria-hidden="true">2.1.</strong> ​为什么 Ruxgo</a></li><li class="chapter-item expanded "><a href="../guide/ruxgo_goals.html"><strong aria-hidden="true">2.2.</strong> Ruxgo 设计目标</a></li><li class="chapter-item expanded "><a href="../guide/build_description.html"><strong aria-hidden="true">2.3.</strong> 构建描述说明</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../guide/toml_design.html"><strong aria-hidden="true">2.3.1.</strong> TOML 文件设计</a></li><li class="chapter-item expanded "><a href="../guide/toml_example.html"><strong aria-hidden="true">2.3.2.</strong> TOML 文件示例</a></li></ol></li><li class="chapter-item expanded "><a href="../guide/build_project.html"><strong aria-hidden="true">2.4.</strong> 构建一个项目</a></li></ol></li><li class="chapter-item expanded "><a href="../commands/index.html"><strong aria-hidden="true">3.</strong> Ruxgo 命令</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../commands/general-commands.html"><strong aria-hidden="true">3.1.</strong> 通用命令</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../commands/ruxgo-init.html"><strong aria-hidden="true">3.1.1.</strong> ruxgo init</a></li><li class="chapter-item expanded "><a href="../commands/ruxgo-pkg.html"><strong aria-hidden="true">3.1.2.</strong> ruxgo pkg</a></li><li class="chapter-item expanded "><a href="../commands/ruxgo-help.html"><strong aria-hidden="true">3.1.3.</strong> ruxgo help</a></li></ol></li><li class="chapter-item expanded "><a href="../commands/build-commands.html"><strong aria-hidden="true">3.2.</strong> 构建命令</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../commands/ruxgo-build.html"><strong aria-hidden="true">3.2.1.</strong> ruxgo -b</a></li><li class="chapter-item expanded "><a href="../commands/ruxgo-run.html"><strong aria-hidden="true">3.2.2.</strong> ruxgo -r</a></li><li class="chapter-item expanded "><a href="../commands/ruxgo-clean.html"><strong aria-hidden="true">3.2.3.</strong> ruxgo -c</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="../run_apps.html"><strong aria-hidden="true">4.</strong> 运行不同的app</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Ruxgo 手册</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/syswonder/ruxgo" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="为什么-ruxgo"><a class="header" href="#为什么-ruxgo">为什么 Ruxgo</a></h1>
+<h3 id="ruxos-早期构建过程的局限性"><a class="header" href="#ruxos-早期构建过程的局限性">RuxOS 早期构建过程的局限性</a></h3>
+<p>在 RuxOS 的早期构建实践中，Make 构建工具通过 Makefile 来组织和管理依赖关系和构件层级，如下图所示。在构建开始时，首先需要通过环境变量指定目标架构、目标应用、日志级别以及 Features 等信息，随后通过顶级 Makefile 来启动整体构建流程。其中，build.mk 文件负责完成 OS Unikernel 镜像的构建，而具体的 RuxOS 内核构建、子构件选择、用户库构建则分别由 cargo.mk、features.mk、build_c.mk 和 build_musl.mk来完成。此外，镜像的运行和测试则通过 qemu.mk 和 test.mk 完成。</p>
+<p><img src="./images/pre_Make.svg" alt="image-20240602175326649" /></p>
+<p>从上述 RuxOS 的构建过程可以看出，随着系统规模的增长和构件数量的增加，Makefile 的配置变得愈加复杂和庞大。每当新增或修改构件时，都可能需要对 Makefile 进行大量修改，这不仅增加了开发者的负担，也降低了项目的可维护性，同时也存在很多的局限性，具体如下：</p>
+<p>（1）缺乏细粒度的构件关系管理：虽然 Make 可以处理基础依赖关系，但并非为解决构件化系统中常见的细粒度依赖问题而设计。在这样的系统中，构件和特性的选择可能高度动态，因此需要更灵活的依赖解决方案。</p>
+<p>（2）缺乏对配置的有效支持：Makefile 本身并不是为处理复杂的配置关系而设计的。当 RuxOS 需要灵活的配置来选择和组合不同构件时，开发者常常不得不依靠环境变量或手动编辑 Makefile，这不仅增加了配置过程的复杂度，还产生了环境隔离问题，导致在不同开发环境下重现构建结果存在一定难度。</p>
+<p>（3）有限的 Rust 生态系统集成：RuxOS 采用 Rust 语言开发，意味着更倾向于与 Cargo 或 Rust 的生态系统无缝集成。然而，Make 与 Cargo 的集成，如通过单独的 cargo.mk 所示，可能引入额外的复杂性，并且缺乏有效的生态系统利用。</p>
+<p>（4）并行构建支持不足：虽然 Make 支持并行构建以加快构建速度，但在复杂的依赖结构下，其并行能力受到限制。例如，构件与构件之间不正确的依赖管理可能导致并行构建出错，从而迫使开发者牺牲构建速度以保证结果的正确性。</p>
+<h3 id="应用程序移植困难及构件化需求"><a class="header" href="#应用程序移植困难及构件化需求">应用程序移植困难及构件化需求</a></h3>
+<p>在 RuxOS 的开发过程中，一个核心目标是实现对广泛类 Unix 应用程序的兼容，旨在通过整合类 Unix 应用生态来扩展 RuxOS 的生态系统。在项目的早期阶段，移植应用程序的一个直接方法是利用应用程序原有的构建工具，来首先生成库文件或中间对象文件，随后将这些文件与 RuxOS 静态库链接，形成最终的 Unikernel 镜像文件。然而，在实际的移植过程以及后期维护、开发过程中，都面临着多重挑战，具体如下：</p>
+<p>（1）应用程序的构件化需求：应用程序的构建通常涵盖了众多功能模块，包括核心功能、辅助功能、测试功能以及平台特定功能等，其中许多功能并非在所有场景下都是必需的。在 RuxOS 上移植这些应用时，由于 RuxOS 可能缺少某些系统库或不支持特定的函数调用，直接移植整个应用程序可能会遇到兼容性问题。</p>
+<p>（2）应用程序的后期维护需求：一些中等规模的软件项目，其 Makefile 也可能包含数千行代码。在将应用移植到 RuxOS 后，为适配 RuxOS 的构建需求，对原有 Makefile 的调整和修改不可避免，从而加大了应用程序后期维护工作的难度。</p>
+<p>（3）应用程序的增量构建需求：在RuxOS上对应用程序进行二次开发或修改时，完整的构建过程可能耗费大量时间，这使得增量构建成为开发过程中的一个必要需求。</p>
+<h3 id="ruxos构件化管理缺乏"><a class="header" href="#ruxos构件化管理缺乏">RuxOS构件化管理缺乏</a></h3>
+<p>原有 RuxOS 的开发和部署缺乏有效的构件化管理。例如下图所示，RuxOS 的 Modules 模块包含了主干构件和功能构件。主干构件，如 ruxruntime、ruxhal、ruxconfig 等，构成了 RuxOS 的核心，是系统运行不可或缺的部分。相比之下，功能构件如 ruxtask、ruxfs、ruxdriver 等则根据应用程序的具体需求进行选择，这些模块易于变动且高度可配置。</p>
+<p><img src="./images/Modules.svg" alt="image-20240602180919927" /></p>
+<p>在应用程序构建过程中，开发者首先需要本地下载完整的 RuxOS 代码库，然后基于特定应用的需求，从 Ulib 库、Modules 模块或 Crates 模块中选择必要的构件集合，最终创建 Unikernel 镜像。这一过程在 RuxOS 项目初期或许可行，但随着项目的发展和构件数量的增加，项目的维护难度和本地存储需求也将显著提升。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../guide/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../guide/ruxgo_goals.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../guide/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../guide/ruxgo_goals.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../assets/fzf.umd.js"></script>
+        <script src="../assets/elasticlunr.js"></script>
+
+
+    </div>
+    </body>
+</html>

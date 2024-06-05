@@ -1,0 +1,843 @@
+<!DOCTYPE HTML>
+<html lang="zh" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Ruxgo 手册</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">简介</a></li><li class="chapter-item expanded "><a href="installation.html"><strong aria-hidden="true">1.</strong> Ruxgo 安装</a></li><li class="chapter-item expanded "><a href="guide/index.html"><strong aria-hidden="true">2.</strong> Ruxgo 指南</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="guide/why_ruxgo.html"><strong aria-hidden="true">2.1.</strong> ​为什么 Ruxgo</a></li><li class="chapter-item expanded "><a href="guide/ruxgo_goals.html"><strong aria-hidden="true">2.2.</strong> Ruxgo 设计目标</a></li><li class="chapter-item expanded "><a href="guide/build_description.html"><strong aria-hidden="true">2.3.</strong> 构建描述说明</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="guide/toml_design.html"><strong aria-hidden="true">2.3.1.</strong> TOML 文件设计</a></li><li class="chapter-item expanded "><a href="guide/toml_example.html"><strong aria-hidden="true">2.3.2.</strong> TOML 文件示例</a></li></ol></li><li class="chapter-item expanded "><a href="guide/build_project.html"><strong aria-hidden="true">2.4.</strong> 构建一个项目</a></li></ol></li><li class="chapter-item expanded "><a href="commands/index.html"><strong aria-hidden="true">3.</strong> Ruxgo 命令</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="commands/general-commands.html"><strong aria-hidden="true">3.1.</strong> 通用命令</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="commands/ruxgo-init.html"><strong aria-hidden="true">3.1.1.</strong> ruxgo init</a></li><li class="chapter-item expanded "><a href="commands/ruxgo-pkg.html"><strong aria-hidden="true">3.1.2.</strong> ruxgo pkg</a></li><li class="chapter-item expanded "><a href="commands/ruxgo-help.html"><strong aria-hidden="true">3.1.3.</strong> ruxgo help</a></li></ol></li><li class="chapter-item expanded "><a href="commands/build-commands.html"><strong aria-hidden="true">3.2.</strong> 构建命令</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="commands/ruxgo-build.html"><strong aria-hidden="true">3.2.1.</strong> ruxgo -b</a></li><li class="chapter-item expanded "><a href="commands/ruxgo-run.html"><strong aria-hidden="true">3.2.2.</strong> ruxgo -r</a></li><li class="chapter-item expanded "><a href="commands/ruxgo-clean.html"><strong aria-hidden="true">3.2.3.</strong> ruxgo -c</a></li></ol></li></ol></li><li class="chapter-item expanded "><a href="run_apps.html"><strong aria-hidden="true">4.</strong> 运行不同的app</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Ruxgo 手册</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/syswonder/ruxgo" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="简介"><a class="header" href="#简介">简介</a></h1>
+<p align="center">
+    <img src="./guide/images/ruxgo-logo1.svg" alt="ruxgo-logo" width="55%">
+</p>
+<p><a href="https://github.com/syswonder/ruxgo">Ruxgo</a> 是一个类似于 Cargo 的构建工具, 专用于构建 C/C++ 应用程序, 它只依赖于一个 Toml 文件。</p>
+<p>它也是 <a href="https://github.com/syswonder/ruxos">RuxOS</a> 的一个配套命令行工具, 其目标是简化 RuxOS 及其上 C/C++ 应用程序的组装构建和管理。</p>
+<p><strong>Ruxgo 官网</strong>：<a href="https://github.com/syswonder/ruxgo">https://github.com/syswonder/ruxgo</a></p>
+<p><strong>Rust 社区</strong>：<a href="https://crates.io/crates/ruxgo">https://crates.io/crates/ruxgo</a></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ruxgo-安装"><a class="header" href="#ruxgo-安装">Ruxgo 安装</a></h1>
+<p>要安装<code>ruxgo</code>可执行文件，您首先需要安装 Rust 和 Cargo。按照<a href="https://www.rust-lang.org/tools/install">Rust安装页面</a>上的说明操作。Ruxgo 目前至少需要 Rust 1.75 版本。</p>
+<p>一旦您安装了 Rust，就可以使用以下命令来构建和安装 Ruxgo:</p>
+<pre><code class="language-sh">cargo install ruxgo
+</code></pre>
+<p>这将自动从<a href="https://crates.io/">crates.io</a>下载并构建 Ruxgo，并将其安装到 Cargo 的全局二进制目录（默认为<code>~/.cargo/bin/</code>）。</p>
+<p>发布到 crates.io 的版本将稍微落后于 GitHub 上托管的版本。如果您需要最新版本，您可以自己构建 Ruxgo 的 git 版本：</p>
+<pre><code class="language-sh">cargo install --git https://github.com/syswonder/ruxgo.git ruxgo
+</code></pre>
+<p><strong>注意:</strong></p>
+<p>如果您在安装时遇到问题，可能需要安装一些构建依赖项，请参考 RuxOS 下的 <a href="https://github.com/syswonder/ruxos?tab=readme-ov-file#install-build-dependencies">README.md</a>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ruxgo-指南"><a class="header" href="#ruxgo-指南">Ruxgo 指南</a></h1>
+<p>本节将为您提供有关如何使用 Ruxgo 开发 C/C++ 应用程序的所有信息。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="为什么-ruxgo"><a class="header" href="#为什么-ruxgo">为什么 Ruxgo</a></h1>
+<h3 id="ruxos-早期构建过程的局限性"><a class="header" href="#ruxos-早期构建过程的局限性">RuxOS 早期构建过程的局限性</a></h3>
+<p>在 RuxOS 的早期构建实践中，Make 构建工具通过 Makefile 来组织和管理依赖关系和构件层级，如下图所示。在构建开始时，首先需要通过环境变量指定目标架构、目标应用、日志级别以及 Features 等信息，随后通过顶级 Makefile 来启动整体构建流程。其中，build.mk 文件负责完成 OS Unikernel 镜像的构建，而具体的 RuxOS 内核构建、子构件选择、用户库构建则分别由 cargo.mk、features.mk、build_c.mk 和 build_musl.mk来完成。此外，镜像的运行和测试则通过 qemu.mk 和 test.mk 完成。</p>
+<p><img src="guide/./images/pre_Make.svg" alt="image-20240602175326649" /></p>
+<p>从上述 RuxOS 的构建过程可以看出，随着系统规模的增长和构件数量的增加，Makefile 的配置变得愈加复杂和庞大。每当新增或修改构件时，都可能需要对 Makefile 进行大量修改，这不仅增加了开发者的负担，也降低了项目的可维护性，同时也存在很多的局限性，具体如下：</p>
+<p>（1）缺乏细粒度的构件关系管理：虽然 Make 可以处理基础依赖关系，但并非为解决构件化系统中常见的细粒度依赖问题而设计。在这样的系统中，构件和特性的选择可能高度动态，因此需要更灵活的依赖解决方案。</p>
+<p>（2）缺乏对配置的有效支持：Makefile 本身并不是为处理复杂的配置关系而设计的。当 RuxOS 需要灵活的配置来选择和组合不同构件时，开发者常常不得不依靠环境变量或手动编辑 Makefile，这不仅增加了配置过程的复杂度，还产生了环境隔离问题，导致在不同开发环境下重现构建结果存在一定难度。</p>
+<p>（3）有限的 Rust 生态系统集成：RuxOS 采用 Rust 语言开发，意味着更倾向于与 Cargo 或 Rust 的生态系统无缝集成。然而，Make 与 Cargo 的集成，如通过单独的 cargo.mk 所示，可能引入额外的复杂性，并且缺乏有效的生态系统利用。</p>
+<p>（4）并行构建支持不足：虽然 Make 支持并行构建以加快构建速度，但在复杂的依赖结构下，其并行能力受到限制。例如，构件与构件之间不正确的依赖管理可能导致并行构建出错，从而迫使开发者牺牲构建速度以保证结果的正确性。</p>
+<h3 id="应用程序移植困难及构件化需求"><a class="header" href="#应用程序移植困难及构件化需求">应用程序移植困难及构件化需求</a></h3>
+<p>在 RuxOS 的开发过程中，一个核心目标是实现对广泛类 Unix 应用程序的兼容，旨在通过整合类 Unix 应用生态来扩展 RuxOS 的生态系统。在项目的早期阶段，移植应用程序的一个直接方法是利用应用程序原有的构建工具，来首先生成库文件或中间对象文件，随后将这些文件与 RuxOS 静态库链接，形成最终的 Unikernel 镜像文件。然而，在实际的移植过程以及后期维护、开发过程中，都面临着多重挑战，具体如下：</p>
+<p>（1）应用程序的构件化需求：应用程序的构建通常涵盖了众多功能模块，包括核心功能、辅助功能、测试功能以及平台特定功能等，其中许多功能并非在所有场景下都是必需的。在 RuxOS 上移植这些应用时，由于 RuxOS 可能缺少某些系统库或不支持特定的函数调用，直接移植整个应用程序可能会遇到兼容性问题。</p>
+<p>（2）应用程序的后期维护需求：一些中等规模的软件项目，其 Makefile 也可能包含数千行代码。在将应用移植到 RuxOS 后，为适配 RuxOS 的构建需求，对原有 Makefile 的调整和修改不可避免，从而加大了应用程序后期维护工作的难度。</p>
+<p>（3）应用程序的增量构建需求：在RuxOS上对应用程序进行二次开发或修改时，完整的构建过程可能耗费大量时间，这使得增量构建成为开发过程中的一个必要需求。</p>
+<h3 id="ruxos构件化管理缺乏"><a class="header" href="#ruxos构件化管理缺乏">RuxOS构件化管理缺乏</a></h3>
+<p>原有 RuxOS 的开发和部署缺乏有效的构件化管理。例如下图所示，RuxOS 的 Modules 模块包含了主干构件和功能构件。主干构件，如 ruxruntime、ruxhal、ruxconfig 等，构成了 RuxOS 的核心，是系统运行不可或缺的部分。相比之下，功能构件如 ruxtask、ruxfs、ruxdriver 等则根据应用程序的具体需求进行选择，这些模块易于变动且高度可配置。</p>
+<p><img src="guide/./images/Modules.svg" alt="image-20240602180919927" /></p>
+<p>在应用程序构建过程中，开发者首先需要本地下载完整的 RuxOS 代码库，然后基于特定应用的需求，从 Ulib 库、Modules 模块或 Crates 模块中选择必要的构件集合，最终创建 Unikernel 镜像。这一过程在 RuxOS 项目初期或许可行，但随着项目的发展和构件数量的增加，项目的维护难度和本地存储需求也将显著提升。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ruxgo-设计目标"><a class="header" href="#ruxgo-设计目标">Ruxgo ​设计目标</a></h1>
+<p>Ruxgo 旨在为 RuxOS 提供一个构件化支持、高性能、用户友好且生态完善的构建系统。其开发专注于满足 RuxOS 的组装构建需求，同时也支持广泛的类 Unix 系统及 Windows 系统上基于 C/C++ 开发的应用程序。下图是改用 Ruxgo 构建应用程序的设计示意，整个构建描述只需要一个 Toml 文件：</p>
+<p><img src="guide/./images/MakeVsRuxgo.svg" alt="image-20240602184356054" /></p>
+<p>Ruxgo 的具体设计目标包括：</p>
+<p>（1）对 RuxOS 的构件化支持：</p>
+<p>Ruxgo 将提供更细粒度的构件和依赖管理能力，支持复杂配置的灵活性，减少手动干预。通过自动化构建流程，Ruxgo 将能够根据应用需求自动选择和配置所需组件，从而提高构建过程的效率。</p>
+<p>（2）对应用程序的构件化支持：</p>
+<p>为了应对应用程序在开发和移植过程中的挑战，Ruxgo 将支持应用程序的功能分解与组装。它将允许应用程序仅包含对于在 RuxOS 上运行所必需的功能模块，同时提供必要的接口来适配和集成系统库和函数调用，确保应用程序的兼容性和性能。</p>
+<p>（3）简洁明了的构建描述：</p>
+<p>Ruxgo 的设计理念核心在于提升用户体验，旨在通过简洁明了的构建描述文件和易于理解的 API 接口，减少软件开发人员在构建过程中的负担，从而降低学习曲线。这样，软件开发人员能够更多地专注于源代码的编写和创新，而非耗费大量时间和精力在理解和使用构建工具上。</p>
+<p>（4）高性能的构建:</p>
+<p>Ruxgo 旨在最小化自身的构建系统开销，以实现快速的响应。同时采用多种优化策略，包括构件内部和构件间的并行编译和增量编译等，以实现在各种计算环境下的高效构建，特别是资源受限的设备上。</p>
+<p>（5）有效的构件包管理:</p>
+<p>Ruxgo 将实现 RuxOS 主干构件和功能构件的远程仓库存储，以便于按需下载和集成，而非在本地存储整个代码库。远程存储机制允许应用程序只获取所需部分，减少本地存储占用，从而加快 Unikernel 镜像的创建过程。此外，相关构件可在远程独立维护和更新，有助于提高系统整体的构建效率和灵活性。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="构建描述说明"><a class="header" href="#构建描述说明">构建描述说明</a></h1>
+<p>Ruxgo 选择 TOML 文件格式进行构建描述。这是一个旨在易于阅读和编写的声明性文件格式，特别适用于 RuxOS 的构建配置需求。</p>
+<p>在具体实现方面，Ruxgo 采用 <code>config_&lt;platform&gt;.toml</code> 文件来根据不同的平台配置项目。例如，针对 Linux 平台采用 <code>config_linux.toml</code> 文件，针对 Windows 平台则采用 <code>config_win32.toml</code> 文件。下图是 Ruxgo 的源代码文件组织示意：</p>
+<p align="center">
+    <img src="guide/./images/source_tree.svg" alt="源码树设计" width="55%">
+</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="toml-文件设计"><a class="header" href="#toml-文件设计">TOML 文件设计</a></h1>
+<p>Ruxgo 的 TOML 构建描述文件主要包含三个核心组件：Build 组件、Targets 组件和 OS 组件。如下图所示：</p>
+<p align="center">
+    <img src="guide/./images/module_design.svg" alt="TOML 组件设计" width="65%">
+</p>
+<p>各个组件的具体功能和配置项描述如下：</p>
+<h3 id="build-组件"><a class="header" href="#build-组件">Build 组件：</a></h3>
+<p>定义构建过程中的基本配置，如编译器的类型和应用程序可执行文件的路径。具体包含以下字段：</p>
+<ul>
+<li>
+<p><code>compiler</code>: 指定使用的编译器类型。例如，对于 GCC 编译器，此字段值为 “gcc”；对于 Clang 编译器，此字段值为 “clang”。</p>
+</li>
+<li>
+<p><code>app</code>: 指定应用程序可执行文件的路径。</p>
+</li>
+</ul>
+<p>通过在 Build 组件中指定适当的编译器，如 GCC 或 Clang，Ruxgo 能够适配不同的开发环境和平台。同时，Build 组件还允许直接指定应用程序的可执行文件路径，以支持预编译的二进制文件的集成和部署。</p>
+<h3 id="targets-组件"><a class="header" href="#targets-组件">Targets 组件：</a></h3>
+<p>定义应用程序的构建目标和相关配置。在 Targets 组件中，每个目标可以是一个库、一个可执行文件或其它类型的构建产物。一个配置文件中可以定义多个应用程序构建目标（Target），每个构建目标都包含以下字段：</p>
+<ul>
+<li>
+<p><code>name</code>: 指定目标的名称。对于动态链接库（“dll”）类型的目标，命名需 “lib_” 前缀开头。</p>
+</li>
+<li>
+<p><code>src</code>: 指定目标源代码的根路径。Ruxgo将递归处理该路径下的所有源文件。</p>
+</li>
+<li>
+<p><code>src_only</code>(可选): 列举仅需构建的 <code>src</code> 中的特定源文件。</p>
+</li>
+<li>
+<p><code>src_exclude</code>(可选): 指定在构建过程中需要排除的 src 中的源文件或目录。</p>
+</li>
+<li>
+<p><code>include_dir</code>: 指定目标源代码所需的头文件路径。</p>
+</li>
+<li>
+<p><code>type</code>: 指定目标的类型，可以是 “static”、“dll”、“object” 或 “exe”，分别代表静态库、动态链接库、中间对象文件和可执行文件。在一个 TOML 文件中，只能有一个 “exe” 目标，但可以有多个其它类型的目标。</p>
+</li>
+<li>
+<p><code>cflags</code>: 指定目标中源文件的编译选项。</p>
+</li>
+<li>
+<p><code>archive</code>(可选): 如果目标类型是 “static”，可以指定一个归档工具来创建静态库，例如：“ar”。</p>
+</li>
+<li>
+<p><code>linker</code>(可选): 指定目标的链接工具。如果该值缺失，则根据 <code>compiler</code> 选项指定默认值，例如：<code>compiler</code> 值为 “gcc”，则目标的默认链接工具为 “gcc”。需要注意的是，当在 RuxOS 上链接所有的库和目标文件时，应当使用 “rust-lld -flavor gnu” 链接工具。</p>
+</li>
+<li>
+<p><code>ldflags</code>: 指定目标中源文件的链接选项。</p>
+</li>
+<li>
+<p><code>deps</code>: 列出当前构建目标所依赖的其它目标，确保依赖关系的正确处理。</p>
+</li>
+</ul>
+<p>通过为每个构建目标配置源代码路径、头文件路径、编译选项、链接选项以及依赖关系等，Ruxgo 能够精确地控制它们的构建过程，并确保目标之间的依赖关系得到正确处理。</p>
+<h3 id="os-组件"><a class="header" href="#os-组件">OS 组件：</a></h3>
+<p>OS 组件是一个<strong>可选组件</strong>，用于为应用程序提供在 RuxOS 上运行所需的配置和环境。OS 组件包含以下几个关键字段：</p>
+<ul>
+<li>
+<p><code>name</code>: 指定操作系统的名称，用于区分不同的操作系统环境配置。</p>
+</li>
+<li>
+<p><code>services</code>: 列出操作系统需要提供的服务，以支持特定功能或应用需求。</p>
+</li>
+<li>
+<p><code>ulib</code>: 指定用户库，例如：“ruxlibc” 或 “ruxmusl”，以便在构建过程中链接。</p>
+</li>
+</ul>
+<p>Ruxgo 提供了基于 QEMU 虚拟机的 x86_64、aarch64 或 riscv64 目标平台的通用配置选项，用户可以根据需求在 [os.platform] 中进行配置，具体字段如下：</p>
+<ul>
+<li>
+<p><code>name</code>: 指定操作系统在哪个平台上运行，可选项有：“x86_64-qemu-q35”、“aarch64-qemu-virt” 和 “riscv64-qemu-virt”。默认值为：“x86_64-qemu-q35”。</p>
+</li>
+<li>
+<p><code>smp</code>: 指定处理器数量。默认值为：“1”。</p>
+</li>
+<li>
+<p><code>mode</code>: 指定构建模式。默认值为：“release”。</p>
+</li>
+<li>
+<p><code>log</code>: 指定日志级别，可选项有：“trace”、“debug”、“info”、“warn“和“error”。默认值为：“warn”。</p>
+</li>
+<li>
+<p><code>v</code>: 指定 verbose 级别，可选项有：“”、“1”、“2”。默认值为：“”。</p>
+</li>
+</ul>
+<p>对于这些依赖于 QEMU 虚拟机的目标平台，可以在 [os.platform.qemu] 中进一步定义 QEMU 的运行时选项。Ruxgo 提供了一些通用的配置字段，具体如下：：</p>
+<ul>
+<li>
+<p><code>blk</code>: 指定是否启用 virtio-blk 存储设备。默认值为：“n”。</p>
+</li>
+<li>
+<p><code>net</code>: 指定是否启用 virtio-net 网络设备。默认值为：“n”。</p>
+</li>
+<li>
+<p><code>graphic</code>: 指定是否启用 virtio-gpu 显示设备和图形输出。默认值为：“n”。</p>
+</li>
+<li>
+<p><code>debug</code>: 指定是否启用 gdb 服务，启用后将监听本地 1234 端口。默认值为：“n”。</p>
+</li>
+<li>
+<p><code>disk_img</code>: 指定虚拟磁盘镜像的路径。默认值为：“./disk_img”。</p>
+</li>
+<li>
+<p><code>v9p</code>: 指定是否启用 virtio-9p 设备。默认值为：“n”。</p>
+</li>
+<li>
+<p><code>v9p_path</code>: 指定 virtio-9p 后端的主机路径。默认值为：“./”。</p>
+</li>
+<li>
+<p><code>qemu_log</code>: 指定是否启用 qemu 日志。默认值为：“n”。</p>
+</li>
+<li>
+<p><code>net_dump</code>: 指定是否启用网络包转储。默认值为：“n”。</p>
+</li>
+<li>
+<p><code>net_dev</code>: 指定 qemu 网络设备的后端类型，可选项有：“user“或“tap”。默认值为：“user”。</p>
+</li>
+<li>
+<p><code>ip</code>: 指定虚拟网络设备的 IPv4 地址。默认值为：“10.0.2.15”。</p>
+</li>
+<li>
+<p><code>gw</code>: 指定虚拟网络设备的网关。默认值为：“10.0.2.2”。</p>
+</li>
+<li>
+<p><code>args</code>: 指定命令行参数，以逗号分隔。它用于传递特定的变量，如 argc、argv。默认值为：“”。</p>
+</li>
+<li>
+<p><code>envs</code>: 指定环境变量，键值对之间用逗号分隔。默认值为：“”。</p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="toml-文件示例"><a class="header" href="#toml-文件示例">TOML 文件示例</a></h1>
+<p>Ruxgo 有如下三种适用场景:</p>
+<ul>
+<li>
+<p>在本地构建自我开发的应用程序；</p>
+</li>
+<li>
+<p>在 RuxOS 上开发或移植应用程序；</p>
+</li>
+<li>
+<p>在 RuxOS 上直接运行应用程序可执行文件。</p>
+</li>
+</ul>
+<p>下面将以 <a href="https://github.com/syswonder/ruxgo/tree/master/apps/sqlite3">sqlite3 </a>为例，分别给出这三种情况下对应的 TOML 文件示例：</p>
+<p><strong>（1）在本地主机（linux平台）构建 Sqlite3:</strong></p>
+<pre><code class="language-toml">[build]
+compiler = "gcc"
+
+[[targets]]
+name = "libsqlite3"
+src = "./sqlite-amalgamation-3410100"
+src_exclude = ["shell.c"]
+include_dir = "./sqlite-amalgamation-3410100"
+type = "static"
+cflags = "-w -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_FLOATING_POINT -DSQLITE_OMIT_LOAD_EXTENSION"
+archive = "ar"
+ldflags = "rcs"
+
+[[targets]]
+name = "local_sqlite3"
+src = "./"
+src_only = ["main.c"]
+include_dir = "./"
+type = "exe"
+cflags = "-w -g"
+ldflags = ""
+deps = ["libsqlite3"]
+</code></pre>
+<p><strong>（2）在 RuxOS 上构建 Sqlite3:</strong></p>
+<pre><code class="language-toml">[build]
+compiler = "gcc"
+
+[os]
+name = "ruxos"
+services = ["fp_simd","alloc","paging","fs","blkfs"]
+ulib = "ruxlibc"
+
+[os.platform]
+name = "x86_64-qemu-q35"
+smp = "2"
+mode = "release"
+log = "error"
+
+[os.platform.qemu]
+blk = "y"
+graphic = "n"
+
+[[targets]]
+name = "libsqlite3"
+src = "./sqlite-amalgamation-3410100"
+src_exclude = ["shell.c"]
+include_dir = "./sqlite-amalgamation-3410100"
+type = "static"
+cflags = "-w -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_FLOATING_POINT -DSQLITE_OMIT_LOAD_EXTENSION"
+archive = "ar"
+ldflags = "rcs"
+
+[[targets]]
+name = "ruxos_sqlite3"
+src = "./"
+src_only = ["main.c"]
+include_dir = "./"
+type = "exe"
+cflags = "-w -g"
+linker = "rust-lld -flavor gnu"
+ldflags = ""
+deps = ["libsqlite3"]
+</code></pre>
+<p><strong>（3）在 RuxOS 上运行 Sqlite3 可执行文件:</strong></p>
+<pre><code class="language-toml">[build]
+compiler = "gcc"
+app = "your_app_path"   # 在这里指定可执行文件路径
+
+[os]
+name = "ruxos"
+services = ["fp_simd","alloc","paging","fs","blkfs"]
+ulib = "ruxlibc"
+
+[os.platform]
+name = "x86_64-qemu-q35"
+smp = "2"
+mode = "release"
+log = "error"
+
+[os.platform.qemu]
+blk = "y"
+graphic = "n"
+args = ""   # 在这里指定应用程序所需参数
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="构建一个项目"><a class="header" href="#构建一个项目">构建一个项目</a></h1>
+<p>可以使用 Ruxgo 快速开始一个项目。首先，确保您的系统上已安装 ruxgo。如果尚未安装，请参考 <a href="guide/../installation.html">Ruxgo 安装</a> 。</p>
+<p>之后使用如下命令初始化一个 C 项目：</p>
+<pre><code class="language-bash">ruxgo init my_project --c
+</code></pre>
+<p>初始化完成后，切换到 my_project 目录，使用 ruxgo 构建并运行：</p>
+<pre><code class="language-bash">ruxgo -b
+ruxgo -r
+</code></pre>
+<p>如果您想在 RuxOS 上运行，将 my_project 下的<code>config_&lt;platform&gt;.toml</code>文件修改为如下:</p>
+<pre><code class="language-toml">[build]
+compiler = "gcc"
+
+[os]
+name = "ruxos"
+services = []
+ulib = "ruxlibc"
+
+[os.platform]
+name = "x86_64-qemu-q35"
+mode = "release"
+log = "info"
+
+[os.platform.qemu]
+graphic = "n"
+
+[[targets]]
+name = "main"
+src = "./src/"
+include_dir = "./src/include/"
+type = "exe"
+cflags = "-g -Wall -Wextra"
+linker = "rust-lld -flavor gnu"
+ldflags = ""
+deps = []
+</code></pre>
+<p>之后将 my_project 复制到 ruxos/apps/c 目录下，切换到 my_project 目录，使用 ruxgo 构建并运行：</p>
+<pre><code class="language-bash">ruxgo -b
+ruxgo -r
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ruxgo-命令"><a class="header" href="#ruxgo-命令">Ruxgo 命令</a></h1>
+<p>参数信息：</p>
+<pre><code class="language-shell">A Cargo-like build tool for building C and C++ applications
+
+Usage: ruxgo [OPTIONS] [CHOICES]... [COMMAND]
+
+Commands:
+  init    Initialize a new project Defaults to C++ if no language is specified
+  pkg     Package management
+  config  Configuration settings
+  help    Print this message or the help of the given subcommand(s)
+
+Arguments:
+  [CHOICES]...  Choose which parts to delete
+
+Options:
+  -b, --build                   Build your project
+  -c, --clean                   Clean the obj and bin intermediates
+  -r, --run                     Run the executable
+      --path &lt;PATH&gt;             Path argument to pass to switch to the specified directory
+      --bin-args=&lt;BIN_ARGS&gt;...  Arguments to pass to the executable when running
+      --gen-cc                  Generate compile_commands.json
+      --gen-vsc                 Generate .vscode/c_cpp_properties.json
+  -h, --help                    Print help
+  -V, --version                 Print version
+</code></pre>
+<ul>
+<li>
+<p><a href="commands/./general-commands.html">通用命令</a></p>
+</li>
+<li>
+<p><a href="commands/./build-commands.html">构建命令</a></p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="通用命令"><a class="header" href="#通用命令">通用命令</a></h1>
+<ul>
+<li>
+<p><a href="commands/./ruxgo-init.html">ruxgo init</a></p>
+</li>
+<li>
+<p><a href="commands/./ruxgo-pkg.html">ruxgo pkg</a></p>
+</li>
+<li>
+<p><a href="commands/./ruxgo-help.html">ruxgo help</a></p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ruxgo-init"><a class="header" href="#ruxgo-init">ruxgo init</a></h1>
+<p>当您开始一个新项目时，通常需要一些基本的框架设置。<code>ruxgo</code> 提供了 <code>init</code> 命令来帮助您快速开始一个新的 C 或 C++ 项目。</p>
+<h2 id="使用方式"><a class="header" href="#使用方式">使用方式</a></h2>
+<p>要初始化一个新项目，使用以下命令：</p>
+<pre><code>ruxgo init &lt;项目名称&gt; [--c] [--cpp]
+</code></pre>
+<ul>
+<li><code>&lt;项目名称&gt;</code>: 指定新项目的名称。</li>
+<li><code>--c</code>: 初始化一个 C 语言项目。</li>
+<li><code>--cpp</code>: 初始化一个 C++ 语言项目。</li>
+</ul>
+<p>注意：<code>--c</code> 和 <code>--cpp</code> 选项不能同时使用。如果都不指定，则默认创建一个 C++ 项目。</p>
+<h2 id="命令行为"><a class="header" href="#命令行为">命令行为</a></h2>
+<p>当运行 <code>ruxgo init</code> 命令后，将会在当前目录下创建一个新的项目目录，其中包括以下内容：</p>
+<pre><code>&lt;项目名称&gt;/
+├── src/
+│   ├── main.c 或 main.cpp
+│   └── include/
+├── .gitignore
+├── README.md
+├── LICENSE
+└── config_&lt;platform&gt;.toml
+</code></pre>
+<ul>
+<li><code>src/</code>：包含所有源代码文件和配置文件。</li>
+<li><code>src/include</code>：用于存放头文件。</li>
+<li><code>.gitignore</code>：用于指定 git 忽略的文件和目录。</li>
+<li><code>README.md</code> 和 <code>LICENSE</code>：项目的基本文档。</li>
+<li><code>config_&lt;platform&gt;.toml</code>：项目的配置文件，根据运行平台的不同而变化（例如 <code>config_linux.toml</code> 或 <code>config_win32.toml</code>）。</li>
+</ul>
+<h2 id="示例"><a class="header" href="#示例">示例</a></h2>
+<ul>
+<li>
+<p>初始化一个名为 “my_project” 的 C++ 项目：</p>
+<pre><code>ruxgo init my_project --cpp
+</code></pre>
+</li>
+<li>
+<p>初始化一个名为 “my_project” 的 C 项目：</p>
+<pre><code>ruxgo init my_project --c
+</code></pre>
+</li>
+</ul>
+<h2 id="提示"><a class="header" href="#提示">提示</a></h2>
+<ul>
+<li>使用 <code>--help</code> 选项可以查看更多命令帮助。</li>
+<li>当项目目录已经存在时，<code>ruxgo init</code> 将不会继续执行，并显示错误信息。</li>
+<li>通过修改 <code>config_&lt;platform&gt;.toml</code> 文件，您可以自定义编译器选项和其他构建设置。</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ruxgo-pkg"><a class="header" href="#ruxgo-pkg">ruxgo pkg</a></h1>
+<p><code>ruxgo pkg</code> 命令用于管理软件包，包括列出、拉取、更新和清理软件包等。</p>
+<h2 id="使用方式-1"><a class="header" href="#使用方式-1">使用方式</a></h2>
+<p>要使用 <code>ruxgo pkg</code> 命令，您可以执行以下操作：</p>
+<pre><code>ruxgo pkg [选项]
+</code></pre>
+<p>可选项如下：</p>
+<ul>
+<li><code>-l, --list</code>: 列出远程仓库中可用的软件包。</li>
+<li><code>-p, --pull &lt;PKG_NAME&gt;</code>: 从远程仓库拉取特定软件包。</li>
+<li><code>-r, --run &lt;APP_BIN&gt;</code>: 运行特定的应用程序二进制文件。</li>
+<li><code>-u, --update &lt;PKG_NAME&gt;</code>: 更新特定软件包。</li>
+<li><code>-c, --clean &lt;PKG_NAME&gt;</code>: 清理特定软件包。</li>
+<li><code>--clean-all</code>: 清理所有软件包。</li>
+<li><code>-h, --help</code>: 打印帮助信息。</li>
+</ul>
+<p>下载的文件保存在 <code>ruxgo_pkg/</code> 目录中，具体内容如下：</p>
+<ul>
+<li><code>app-bin/</code>: 存放 app 可执行文件及其对应脚本。</li>
+<li><code>ruxos/</code>: ruxos 存储位置。</li>
+<li><code>rux-*/</code>: app 源码存储位置。</li>
+<li><code>cache/</code>: 存放 packages 信息的缓存。</li>
+</ul>
+<h2 id="示例-1"><a class="header" href="#示例-1">示例</a></h2>
+<ul>
+<li>
+<p>列出所有可用的软件包：</p>
+<pre><code>ruxgo pkg --list
+</code></pre>
+</li>
+<li>
+<p>从远程仓库拉取名为 “example_pkg” 的软件包：</p>
+<pre><code>ruxgo pkg --pull example_pkg
+</code></pre>
+</li>
+<li>
+<p>更新名为 “example_pkg” 的软件包：</p>
+<pre><code>ruxgo pkg --update example_pkg
+</code></pre>
+</li>
+<li>
+<p>清理名为 “example_pkg” 的软件包：</p>
+<pre><code>ruxgo pkg --clean example_pkg
+</code></pre>
+</li>
+<li>
+<p>清理所有软件包：</p>
+<pre><code>ruxgo pkg --clean-all
+</code></pre>
+</li>
+</ul>
+<h2 id="提示-1"><a class="header" href="#提示-1">提示</a></h2>
+<ul>
+<li>使用 <code>--help</code> 选项可以查看更多命令帮助。</li>
+<li>确保在执行任何软件包管理操作之前，您的系统已连接到互联网。</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ruxgo-help"><a class="header" href="#ruxgo-help">ruxgo help</a></h1>
+<p><code>ruxgo help</code> 命令用于显示 <code>ruxgo</code> 工具的帮助信息，包括其各个子命令的详细说明。</p>
+<h2 id="使用方式-2"><a class="header" href="#使用方式-2">使用方式</a></h2>
+<p>要获取 <code>ruxgo</code> 工具或其任一子命令的帮助信息，您可以执行以下操作：</p>
+<pre><code>ruxgo help [子命令]
+</code></pre>
+<h2 id="示例-2"><a class="header" href="#示例-2">示例</a></h2>
+<ul>
+<li>
+<p>显示 <code>ruxgo</code> 的总体帮助信息：</p>
+<pre><code>ruxgo help
+</code></pre>
+</li>
+<li>
+<p>查看关于 <code>init</code> 命令的详细帮助：</p>
+<pre><code>ruxgo help init
+</code></pre>
+</li>
+<li>
+<p>查看关于 <code>pkg</code> 命令的详细帮助：</p>
+<pre><code>ruxgo help pkg
+</code></pre>
+</li>
+</ul>
+<h2 id="提示-2"><a class="header" href="#提示-2">提示</a></h2>
+<ul>
+<li>不带任何子命令时，<code>ruxgo help</code> 将显示 <code>ruxgo</code> 工具的总体帮助信息，包括所有可用的命令和选项。</li>
+<li>当指定一个子命令时，如 <code>ruxgo help init</code>，将显示该特定子命令的详细帮助信息。</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="构建命令"><a class="header" href="#构建命令">构建命令</a></h1>
+<ul>
+<li>
+<p><a href="commands/./ruxgo-build.html">ruxgo -b</a></p>
+</li>
+<li>
+<p><a href="commands/./ruxgo-run.html">ruxgo -r</a></p>
+</li>
+<li>
+<p><a href="commands/./ruxgo-clean.html">ruxgo -c</a></p>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ruxgo--b"><a class="header" href="#ruxgo--b">ruxgo -b</a></h1>
+<p><code>ruxgo -b</code> 命令用于构建您的项目，需确保当前目录下存在 <code>config_&lt;platform&gt;.toml</code>。</p>
+<h2 id="使用方式-3"><a class="header" href="#使用方式-3">使用方式</a></h2>
+<p>要构建当前项目，您可以执行以下操作：</p>
+<pre><code class="language-bash">ruxgo -b [--path &lt;路径&gt;] [--gen-cc] [--gen-vsc]
+</code></pre>
+<ul>
+<li><code>--path &lt;路径&gt;</code>: 指定一个特定的目录（需存在 <code>config_&lt;platform&gt;.toml</code>）来执行构建操作。如果不提供，则默认在当前目录下执行。</li>
+<li><code>--gen-cc</code>: 生成 <code>compile_commands.json</code> 文件，它包含了编译项目的所有命令。</li>
+<li><code>--gen-vsc</code>: 生成 Visual Studio Code 的配置文件 <code>.vscode/c_cpp_properties.json</code>，它包含了项目的编译器配置和头文件路径。</li>
+</ul>
+<h2 id="命令行为-1"><a class="header" href="#命令行为-1">命令行为</a></h2>
+<p>当执行 <code>ruxgo -b</code> 命令后，将会在当前目录下创建一个名为 <code>ruxgo_bld/</code> 的构建目录，包括以下内容：</p>
+<pre><code class="language-bash">ruxgo_bld/
+├── bin/
+├── obj_linux/ 或 obj_win32/
+├── target/
+├── *.hash
+├── compile_commands.json (如果启用了gen_cc)
+├── .vscode/c_cpp_properties.json (如果启用了gen_vsc)
+└── ruxmusl/ (如果使用了ruxmusl用户库)
+</code></pre>
+<ul>
+<li><code>bin/</code>： 存放构建过程中生成的静态库、动态库、目标文件或可执行文件 。</li>
+<li><code>obj_linux/obj_win32</code>： 存放编译源码生成的中间对象文件 （ *.o ）。</li>
+<li><code>target</code>： 存放构建 ruxos 后生成的 target 文件。</li>
+<li><code>*.hash</code>： 存放构建过程中生成的 hash 文件，用来实现增量构建。</li>
+<li><code>compile_commands.json</code>： 存放构建过程中的所有编译命令，如果启用了 gen_cc。</li>
+<li><code>.vscode/c_cpp_properties.json</code>： 存放项目的 vscode 配置，如果启用了 gen_vsc。</li>
+<li><code>ruxmusl/</code>： 存放构建 ruxmusl 后生成的中间文件及静态库，如果使用了 ruxmusl 。</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ruxgo--r"><a class="header" href="#ruxgo--r">ruxgo -r</a></h1>
+<p><code>ruxgo -r</code> 命令用于运行项目中的可执行文件，需确保当前目录下存在 <code>config_&lt;platform&gt;.toml</code>。</p>
+<h2 id="使用方式-4"><a class="header" href="#使用方式-4">使用方式</a></h2>
+<p>要运行构建的项目，您可以执行以下操作：</p>
+<pre><code>ruxgo -r [--path &lt;路径&gt;] [--bin-args &lt;参数列表&gt;]
+</code></pre>
+<ul>
+<li><code>--path &lt;路径&gt;</code>: 指定一个特定的目录（需存在 <code>config_&lt;platform&gt;.toml</code>）来执行运行操作。如果不提供，则默认在当前目录下执行。</li>
+<li><code>--bin-args=&lt;参数列表&gt;</code>: 提供一系列运行时参数传递给项目的可执行文件，参数跟在<code>=</code>后面且以逗号分隔。</li>
+</ul>
+<h2 id="命令行为-2"><a class="header" href="#命令行为-2">命令行为</a></h2>
+<p>执行 <code>ruxgo -r</code> 命令后，将会运行 <code>bin/</code> 目录下的可执行文件。需要确保在执行目录下存在正确的配置文件，或者使用 <code>--path</code> 指定包含这些文件的目录。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ruxgo--c"><a class="header" href="#ruxgo--c">ruxgo -c</a></h1>
+<p><code>ruxgo -c</code> 命令用于清理项目，需确保当前目录下存在 <code>config_&lt;platform&gt;.toml</code>。</p>
+<h2 id="使用方式-5"><a class="header" href="#使用方式-5">使用方式</a></h2>
+<p>要清理构建的项目，您可以执行以下操作：</p>
+<pre><code>ruxgo -c [--path &lt;路径&gt;]
+</code></pre>
+<ul>
+<li><code>--path &lt;路径&gt;</code>: 指定一个特定的目录（需存在 <code>config_&lt;platform&gt;.toml</code>）来执行清理操作。如果不提供，则默认在当前目录下执行。</li>
+</ul>
+<h2 id="命令行为-3"><a class="header" href="#命令行为-3">命令行为</a></h2>
+<p>执行 <code>ruxgo -c</code> 命令后，<code>ruxgo</code> 提供了一个多选界面，让用户选择要清理的过程文件，按下 Esc 键则退出当前命令，按下空格（Space）键则选中要清理的项目。具体内容如下：</p>
+<ul>
+<li><code>All/</code>： 删除项目所有内容。</li>
+<li><code>App_bins/</code>： 删除构建的 app 可执行文件及其相关库。</li>
+<li><code>Obj/</code>： 删除编译源码生成的中间对象文件（*.o）。</li>
+<li><code>OS/</code>： 删除 ruxos 的构建目录。</li>
+<li><code>Ulib/</code>： 删除 Ulib 的构建内容，如 <code>ruxlibc</code> 或 <code>ruxmusl</code>。</li>
+</ul>
+<p>需要确保在执行目录下存在正确的配置文件，或者使用 <code>--path</code> 指定包含这些文件的目录。</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="运行不同的app"><a class="header" href="#运行不同的app">运行不同的app</a></h1>
+<p>在<code>ruxgo/apps/</code>目录下放置了所有经过测试的 Toml 文件。</p>
+<ul>
+<li>
+<p>如果你正在开发自己的应用程序并希望构建和运行它，你可以参考模板写一个 Toml 文件，然后把它放在你的项目目录下，即可使用  ruxgo 来构建和运行它。</p>
+</li>
+<li>
+<p>如果你想在 RuxOS 上构建一个已经支持的应用程序，你需要将<code>config_linux.toml</code>从<code>ruxgo/apps/&lt;name&gt;/ruxos</code>复制到<code>ruxos/apps/c/&lt;name&gt;</code>，然后参考说明使用 ruxgo 构建并运行它。</p>
+</li>
+<li>
+<p>如果你有自己的应用程序可执行文件，并希望在 RuxOS 上运行它，你可以参考<code>ruxgo/apps/loader_app</code>下的模板并配置你自己的 Toml 文件，然后使用 ruxgo 来构建和运行它。</p>
+</li>
+</ul>
+<p><strong>注:</strong> 有关详细信息，请参阅每个 app 目录下的 README.md。以下应用程序已获支持:</p>
+<ul>
+<li><input disabled="" type="checkbox" checked=""/>
+<a href="https://github.com/syswonder/ruxgo/tree/master/apps/redis">redis</a></li>
+<li><input disabled="" type="checkbox" checked=""/>
+<a href="https://github.com/syswonder/ruxgo/tree/master/apps/sqlite3">sqlite3</a></li>
+<li><input disabled="" type="checkbox" checked=""/>
+<a href="https://github.com/syswonder/ruxgo/tree/master/apps/iperf">iperf</a></li>
+<li><input disabled="" type="checkbox" checked=""/>
+<a href="https://github.com/syswonder/ruxgo/tree/master/apps/loader_app">loader_app</a></li>
+<li><input disabled="" type="checkbox" checked=""/>
+helloworld</li>
+<li><input disabled="" type="checkbox" checked=""/>
+memtest</li>
+<li><input disabled="" type="checkbox" checked=""/>
+httpclient</li>
+<li><input disabled="" type="checkbox" checked=""/>
+httpserver</li>
+<li><input disabled="" type="checkbox" checked=""/>
+nginx</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="assets/fzf.umd.js"></script>
+        <script src="assets/elasticlunr.js"></script>
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>
